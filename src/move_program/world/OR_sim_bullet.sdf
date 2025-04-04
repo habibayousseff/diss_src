@@ -1,0 +1,315 @@
+<sdf version='1.10'>
+  <world name='empty'>
+	<physics name="bullet_physics" type="bullet">
+	<max_step_size>0.001</max_step_size>
+	<real_time_factor>1</real_time_factor>
+	<real_time_update_rate>1000</real_time_update_rate>
+	<bullet>
+		<solver>
+		<type>btSequentialImpulseConstraintSolver</type>
+		<min_bounce_velocity>0.1</min_bounce_velocity>
+		</solver>
+		<constraints>
+		<cfm>0.00001</cfm>
+		<erp>0.2</erp>
+		</constraints>
+	</bullet>
+	</physics>
+    <plugin name='gz::sim::systems::Physics' filename='gz-sim-physics-system'/>
+    <plugin name='gz::sim::systems::UserCommands' filename='gz-sim-user-commands-system'/>
+    <plugin name='gz::sim::systems::SceneBroadcaster' filename='gz-sim-scene-broadcaster-system'/>
+    <plugin name='gz::sim::systems::Contact' filename='gz-sim-contact-system'/>
+    <gravity>0 0 -9.8000000000000007</gravity>
+    <magnetic_field>5.5644999999999998e-06 2.2875799999999999e-05 -4.2388400000000002e-05</magnetic_field>
+    <atmosphere type='adiabatic'/>
+    <scene>
+      <ambient>0.400000006 0.400000006 0.400000006 1</ambient>
+      <background>0.699999988 0.699999988 0.699999988 1</background>
+      <shadows>true</shadows>
+    </scene>
+    <model name='ground_plane'>
+      <static>true</static>
+      <link name='link'>
+        <collision name='collision'>
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>100 100</size>
+            </plane>
+          </geometry>
+          <surface>
+            <friction>
+              <ode/>
+            </friction>
+            <bounce/>
+            <contact/>
+          </surface>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>100 100</size>
+            </plane>
+          </geometry>
+          <material>
+            <ambient>0.800000012 0.800000012 0.800000012 1</ambient>
+            <diffuse>0.800000012 0.800000012 0.800000012 1</diffuse>
+            <specular>0.800000012 0.800000012 0.800000012 1</specular>
+          </material>
+        </visual>
+        <pose>0 0 0 0 0 0</pose>
+        <inertial>
+          <pose>0 0 0 0 0 0</pose>
+          <mass>1</mass>
+          <inertia>
+            <ixx>1</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>1</iyy>
+            <iyz>0</iyz>
+            <izz>1</izz>
+          </inertia>
+        </inertial>
+        <enable_wind>false</enable_wind>
+      </link>
+      <pose>0 0 0 0 0 0</pose>
+      <self_collide>false</self_collide>
+    </model>
+    <model name='Walls'>
+      <include>
+        <uri>file:///home/habibahassan/.gazebo/models/aws_robomaker_warehouse_WallB_01</uri>
+      </include>
+      <pose>0 0 0 0 0 1.5708000000000013</pose>
+      <static>false</static>
+      <self_collide>false</self_collide>
+    </model>
+    <model name='Table1'>
+      <include>
+        <uri>file:///home/habibahassan/.gazebo/models/Table</uri>
+      </include>
+      <pose>1.097176194190979 1.3964200019836426 0 0 0 0</pose>
+      <static>false</static>
+      <self_collide>false</self_collide>
+    </model>
+    <model name='Table2'>
+      <include>
+        <uri>file:///home/habibahassan/.gazebo/models/Table</uri>
+      </include>
+      <pose>1.0843600034713745 0.070829622447490692 0 0 0 0</pose>
+      <static>false</static>
+      <self_collide>false</self_collide>
+    </model>
+    <model name='Tray1'>
+      <include>
+        <uri>file:///home/habibahassan/.gazebo/models/tray</uri>
+      </include>
+      <pose>1.1489399671554565 1.3731900453567505 1.0151047706604004 0 0 1.5699599088626004</pose>
+      <static>false</static>
+      <self_collide>false</self_collide>
+    </model>
+    <model name='Tray2'>
+      <include>
+        <uri>file:///home/habibahassan/.gazebo/models/tray</uri>
+      </include>
+      <pose>1.1056499481201174 0.082587398588657379 1.0144892930984497 0 0 1.5707999672671704</pose>
+      <static>false</static>
+      <self_collide>false</self_collide>
+    </model>
+    <model name='IVStand'>
+      <include>
+        <uri>file:///home/habibahassan/.gazebo/models/IVStand</uri>
+      </include>
+      <pose>-3.4603030681610107 1.006600022315979 0 0 0 0</pose>
+      <static>false</static>
+      <self_collide>false</self_collide>
+    </model>
+    <model name='BPCart'>
+      <include>
+        <uri>file:///home/habibahassan/.gazebo/models/BPCart</uri>
+      </include>
+      <pose>-3.4405167102813716 2.8725559711456299 0 0 0 0.99320003590794281</pose>
+      <static>false</static>
+      <self_collide>false</self_collide>
+    </model>
+    <model name='AnesthesiaMachine'>
+      <include>
+        <uri>file:///home/habibahassan/.gazebo/models/AnesthesiaMachine</uri>
+      </include>
+      <pose>-3.1603407859802246 0.16262209415435791 0 0 0 1.5796999977682844</pose>
+      <static>false</static>
+      <self_collide>false</self_collide>
+    </model>
+    <model name='Nurse'>
+      <include>
+        <uri>file:///home/habibahassan/.gazebo/models/Scrubs</uri>
+      </include>
+      <pose>0.25358438491821278 1.9562761783599854 0 0 0 -0.69318399518832274</pose>
+      <static>false</static>
+      <self_collide>false</self_collide>
+    </model>
+    <model name='TrolleyBedPatient'>
+      <include>
+        <uri>file:///home/habibahassan/.gazebo/models/TrolleyBedPatient</uri>
+      </include>
+      <pose>-2.4239256381988525 1.8299000263214111 0 0 0 0</pose>
+      <static>false</static>
+      <self_collide>false</self_collide>
+    </model>
+    <model name='RedCup'>
+      <include>
+        <uri>file:///home/habibahassan/.gazebo/models/red_plastic_cup</uri>
+      </include>
+      <pose>0.973062 1.295022 1.088953 0 0 0</pose>
+      <static>false</static>
+      <self_collide>false</self_collide>
+    </model>
+    <model name='GreenCup'>
+      <include>
+        <uri>file:///home/habibahassan/.gazebo/models/green_plastic_cup</uri>
+      </include>
+      <pose>1.148940 1.295022 1.088953 0 0 0</pose>
+      <static>false</static>
+      <self_collide>false</self_collide>
+    </model>
+    <model name='BlueCup'>
+      <include>
+        <uri>file:///home/habibahassan/.gazebo/models/blue_plastic_cup</uri>
+      </include>
+      <pose>1.324818 1.295022 1.088953 0 0 0</pose>
+      <static>false</static>
+      <self_collide>false</self_collide>
+    </model>
+    <model name='YellowCup'>
+      <include>
+        <uri>file:///home/habibahassan/.gazebo/models/yellow_plastic_cup</uri>
+      </include>
+      <pose>0.973062 1.451358 1.088953 0 0 0</pose>
+      <static>false</static>
+      <self_collide>false</self_collide>
+    </model>
+    <model name='PurpleCup'>
+      <include>
+        <uri>file:///home/habibahassan/.gazebo/models/purple_plastic_cup</uri>
+      </include>
+      <pose>1.148940 1.451358 1.088953 0 0 0</pose>
+      <static>false</static>
+      <self_collide>false</self_collide>
+    </model>
+    <model name='CylinderTable'>
+      <pose>1.0613499879837036 0.73380500078201294 0.49915310740470886 0 0 0</pose>
+      <link name='cylinder_link'>
+        <inertial>
+          <inertia>
+            <ixx>0.050000000000000003</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.050000000000000003</iyy>
+            <iyz>0</iyz>
+            <izz>0.040000000000000001</izz>
+          </inertia>
+          <mass>0.80000000000000004</mass>
+          <pose>0 0 0 0 0 0</pose>
+        </inertial>
+        <collision name='cylinder_collision'>
+          <geometry>
+            <cylinder>
+              <radius>0.20000000000000001</radius>
+              <length>1</length>
+            </cylinder>
+          </geometry>
+          <surface>
+            <friction>
+              <ode/>
+            </friction>
+            <bounce/>
+            <contact/>
+          </surface>
+        </collision>
+        <visual name='cylinder_visual'>
+          <geometry>
+            <cylinder>
+              <radius>0.20000000000000001</radius>
+              <length>1</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.0599999987 0.0799999982 0.25999999 1</ambient>
+            <diffuse>0.0900000036 0.109999999 0.349999994 1</diffuse>
+            <specular>1 1 1 1</specular>
+          </material>
+        </visual>
+        <pose>0 0 0 0 0 0</pose>
+        <enable_wind>false</enable_wind>
+      </link>
+      <static>false</static>
+      <self_collide>false</self_collide>
+    </model>
+    <model name='RoboticArmBase'>
+      <pose>1.0613499879837036 0.73379999399185181 1.05 0 0 0</pose>
+      <link name='box_link'>
+        <inertial>
+          <inertia>
+            <ixx>0.041660000000000003</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.041660000000000003</iyy>
+            <iyz>0</iyz>
+            <izz>0.041660000000000003</izz>
+          </inertia>
+          <mass>0.5</mass>
+          <pose>0 0 0 0 0 0</pose>
+        </inertial>
+        <collision name='box_collision'>
+          <geometry>
+            <box>
+              <size>0.20000000000000001 0.20000000000000001 0.10000000000000001</size>
+            </box>
+          </geometry>
+          <surface>
+            <friction>
+              <ode/>
+            </friction>
+            <bounce/>
+            <contact/>
+          </surface>
+        </collision>
+        <visual name='box_visual'>
+          <geometry>
+            <box>
+              <size>0.20000000000000001 0.20000000000000001 0.10000000000000001</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.529999971 0.810000002 0.980000019 1</ambient>
+            <diffuse>0.529999971 0.810000002 0.980000019 1</diffuse>
+            <specular>1 1 1 1</specular>
+          </material>
+        </visual>
+        <pose>0 0 0 0 0 0</pose>
+        <enable_wind>false</enable_wind>
+      </link>
+      <static>false</static>
+      <self_collide>false</self_collide>
+    </model>
+    <light name='sun' type='directional'>
+      <pose>0 0 10 0 0 0</pose>
+      <cast_shadows>true</cast_shadows>
+      <intensity>1</intensity>
+      <direction>-0.5 0.10000000000000001 -0.90000000000000002</direction>
+      <diffuse>0.800000012 0.800000012 0.800000012 1</diffuse>
+      <specular>0.200000003 0.200000003 0.200000003 1</specular>
+      <attenuation>
+        <range>1000</range>
+        <linear>0.01</linear>
+        <constant>0.90000000000000002</constant>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <spot>
+        <inner_angle>0</inner_angle>
+        <outer_angle>0</outer_angle>
+        <falloff>0</falloff>
+      </spot>
+    </light>
+  </world>
+</sdf>
