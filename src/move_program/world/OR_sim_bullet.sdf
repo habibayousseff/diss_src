@@ -1,20 +1,10 @@
 <sdf version='1.10'>
   <world name='empty'>
-	<physics name="bullet_physics" type="bullet">
-	<max_step_size>0.001</max_step_size>
-	<real_time_factor>1</real_time_factor>
-	<real_time_update_rate>1000</real_time_update_rate>
-	<bullet>
-		<solver>
-		<type>btSequentialImpulseConstraintSolver</type>
-		<min_bounce_velocity>0.1</min_bounce_velocity>
-		</solver>
-		<constraints>
-		<cfm>0.00001</cfm>
-		<erp>0.2</erp>
-		</constraints>
-	</bullet>
-	</physics>
+    <physics name='1ms' type='bullet'>
+      <max_step_size>0.001</max_step_size>
+      <real_time_factor>1</real_time_factor>
+      <real_time_update_rate>1000</real_time_update_rate>
+    </physics>
     <plugin name='gz::sim::systems::Physics' filename='gz-sim-physics-system'/>
     <plugin name='gz::sim::systems::UserCommands' filename='gz-sim-user-commands-system'/>
     <plugin name='gz::sim::systems::SceneBroadcaster' filename='gz-sim-scene-broadcaster-system'/>
@@ -104,7 +94,7 @@
       <include>
         <uri>file:///home/habibahassan/.gazebo/models/tray</uri>
       </include>
-      <pose>1.1489399671554565 1.3731900453567505 1.0151047706604004 0 0 1.5699599088626004</pose>
+      <pose>1.1489398006610128 1.3731901626175813 1.0229255969675031 -5.3656764137858278e-09 8.0133192449761844e-08 1.5699591575187404</pose>
       <static>false</static>
       <self_collide>false</self_collide>
     </model>
@@ -112,7 +102,7 @@
       <include>
         <uri>file:///home/habibahassan/.gazebo/models/tray</uri>
       </include>
-      <pose>1.1056499481201174 0.082587398588657379 1.0144892930984497 0 0 1.5707999672671704</pose>
+      <pose>1.1056499481201256 0.08258739858924613 1.0229184504472586 2.1354732609792488e-16 -1.4405437392869208e-16 1.5707999672671755</pose>
       <static>false</static>
       <self_collide>false</self_collide>
     </model>
@@ -120,7 +110,7 @@
       <include>
         <uri>file:///home/habibahassan/.gazebo/models/IVStand</uri>
       </include>
-      <pose>-3.4603030681610107 1.006600022315979 0 0 0 0</pose>
+      <pose>-3.4603030684108265 1.0066000158677575 0.00066896047900204519 7.7348799653635384e-06 -5.3738700962429344e-06 2.1819400388173697e-09</pose>
       <static>false</static>
       <self_collide>false</self_collide>
     </model>
@@ -128,7 +118,7 @@
       <include>
         <uri>file:///home/habibahassan/.gazebo/models/BPCart</uri>
       </include>
-      <pose>-3.4405167102813716 2.8725559711456299 0 0 0 0.99320003590794281</pose>
+      <pose>-3.4405167102770906 2.8725559711443407 0.0034458880696220783 1.4462125198490827e-09 2.0303500637718513e-14 0.99320003590793904</pose>
       <static>false</static>
       <self_collide>false</self_collide>
     </model>
@@ -136,7 +126,7 @@
       <include>
         <uri>file:///home/habibahassan/.gazebo/models/AnesthesiaMachine</uri>
       </include>
-      <pose>-3.1603407859802246 0.16262209415435791 0 0 0 1.5796999977682844</pose>
+      <pose>-3.1603407859802246 0.16262209415435791 0 0 0 1.5796999977682851</pose>
       <static>false</static>
       <self_collide>false</self_collide>
     </model>
@@ -144,7 +134,7 @@
       <include>
         <uri>file:///home/habibahassan/.gazebo/models/Scrubs</uri>
       </include>
-      <pose>0.25358438491821278 1.9562761783599854 0 0 0 -0.69318399518832274</pose>
+      <pose>0.25358438491821278 1.9562761783599854 0 0 0 -0.69318399518832263</pose>
       <static>false</static>
       <self_collide>false</self_collide>
     </model>
@@ -160,7 +150,7 @@
       <include>
         <uri>file:///home/habibahassan/.gazebo/models/red_plastic_cup</uri>
       </include>
-      <pose>0.973062 1.295022 1.088953 0 0 0</pose>
+      <pose>0.88751487314155286 1.2152067544497509 1.1082690472712595 0.024793612305369132 -0.11920867513308894 0.02121419512914334</pose>
       <static>false</static>
       <self_collide>false</self_collide>
     </model>
@@ -168,7 +158,7 @@
       <include>
         <uri>file:///home/habibahassan/.gazebo/models/green_plastic_cup</uri>
       </include>
-      <pose>1.148940 1.295022 1.088953 0 0 0</pose>
+      <pose>1.148931338628395 1.2950325237360625 1.1053001488172356 1.8152582114127458e-05 -1.8978331803208298e-05 -0.0011531325289309583</pose>
       <static>false</static>
       <self_collide>false</self_collide>
     </model>
@@ -176,7 +166,7 @@
       <include>
         <uri>file:///home/habibahassan/.gazebo/models/blue_plastic_cup</uri>
       </include>
-      <pose>1.324818 1.295022 1.088953 0 0 0</pose>
+      <pose>1.4265158460825498 1.2172894448851186 1.0728000930921819 -3.567649859973075e-07 -1.8554070193920689e-06 -0.22894363566395884</pose>
       <static>false</static>
       <self_collide>false</self_collide>
     </model>
@@ -184,7 +174,7 @@
       <include>
         <uri>file:///home/habibahassan/.gazebo/models/yellow_plastic_cup</uri>
       </include>
-      <pose>0.973062 1.451358 1.088953 0 0 0</pose>
+      <pose>0.9534718622290137 1.4408418540460322 1.1067752405538387 0.043641679121285352 -0.15571982824683858 -0.058388463491724912</pose>
       <static>false</static>
       <self_collide>false</self_collide>
     </model>
@@ -192,12 +182,12 @@
       <include>
         <uri>file:///home/habibahassan/.gazebo/models/purple_plastic_cup</uri>
       </include>
-      <pose>1.148940 1.451358 1.088953 0 0 0</pose>
+      <pose>1.3496863714124816 1.4071175597373917 1.1080994627589955 0.026583242606947957 0.12871593537407075 -0.018941181094157877</pose>
       <static>false</static>
       <self_collide>false</self_collide>
     </model>
     <model name='CylinderTable'>
-      <pose>1.0613499879837036 0.73380500078201294 0.49915310740470886 0 0 0</pose>
+      <pose>1.0613498007489151 0.73380497916858112 0.49999916004197842 6.7150085010451323e-09 -1.704883990461741e-07 -4.0970545368176946e-08</pose>
       <link name='cylinder_link'>
         <inertial>
           <inertia>
@@ -246,7 +236,7 @@
       <self_collide>false</self_collide>
     </model>
     <model name='RoboticArmBase'>
-      <pose>1.0613499879837036 0.73379999399185181 1.05 0 0 0</pose>
+      <pose>1.0613498271829835 0.73380000712025228 1.0499989531867715 -1.8879927522797817e-06 4.0095446469683059e-06 -7.4101112918598737e-07</pose>
       <link name='box_link'>
         <inertial>
           <inertia>
@@ -292,6 +282,11 @@
       <static>false</static>
       <self_collide>false</self_collide>
     </model>
+    <include>
+      <uri>file://<urdf-string></uri>
+      <name>ur</name>
+      <pose>8.8817841970012523e-16 4.4408920985006262e-16 0 0 0 2.5410988417629018e-21</pose>
+    </include>
     <light name='sun' type='directional'>
       <pose>0 0 10 0 0 0</pose>
       <cast_shadows>true</cast_shadows>
