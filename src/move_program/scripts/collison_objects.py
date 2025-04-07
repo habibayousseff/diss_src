@@ -40,6 +40,34 @@ class SceneObjectsNode(Node):
         # self.add_cup("blue_cup", 1.324818, 1.295022)
         # self.add_cup("yellow_cup", 0.973062, 1.451358)    
         # self.add_cup("purple_cup", 1.148940, 1.451358)
+        
+        # self.add_goal_cylinder("goal1_red",    0.433761835,  0.553839027, 0.499693)
+        # self.add_goal_cylinder("goal2_blue",   1.631051421,  0.565548003, 0.499980)
+        # self.add_goal_cylinder("goal3_green",  0.497940183, -0.00983083,  0.499974)
+        # self.add_goal_cylinder("goal4_yellow", 1.023489952, -0.013558522, 0.499980)
+        # self.add_goal_cylinder("goal5_purple", 1.568845868, -0.029839899, 0.499992)
+
+    def add_goal_cylinder(self, goal_id, x, y, z):
+        obj = CollisionObject()
+        obj.id = goal_id
+        obj.header.frame_id = "world"
+
+        shape = SolidPrimitive()
+        shape.type = SolidPrimitive.CYLINDER
+        shape.dimensions = [1.3, 0.2]  # [height, radius]
+
+        pose = Pose()
+        pose.position.x = x
+        pose.position.y = y
+        pose.position.z = z
+        pose.orientation.w = 1.0
+
+        obj.primitives.append(shape)
+        obj.primitive_poses.append(pose)
+        obj.operation = CollisionObject.ADD
+
+        self.collision_pub.publish(obj)
+        self.get_logger().info(f"Added {goal_id} collision")
 
     # -------------------------------------------------------------------------
     #  Cylinder Table

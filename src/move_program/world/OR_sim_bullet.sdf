@@ -94,23 +94,95 @@
       <include>
         <uri>file:///home/habibahassan/.gazebo/models/tray</uri>
       </include>
-      <pose>1.1489398006610128 1.3731901626175813 1.0229255969675031 -5.3656764137858278e-09 8.0133192449761844e-08 1.5699591575187404</pose>
+      <pose>1.1489399671554565 1.3731900453567505 1.0151047706604004 0 0 1.5699999999999998</pose>
       <static>false</static>
       <self_collide>false</self_collide>
     </model>
     <model name='Tray2'>
       <include>
-        <uri>file:///home/habibahassan/.gazebo/models/tray</uri>
+        <uri>file:///home/habibahassan/.gazebo/models/traySlots</uri>
       </include>
-      <pose>1.1056499481201256 0.08258739858924613 1.0229184504472586 2.1354732609792488e-16 -1.4405437392869208e-16 1.5707999672671755</pose>
+      <pose>1.1056499481201174 0.082587398588657379 1.0144892930984497 0 0 1.5699999999999998</pose>
       <static>false</static>
+      <self_collide>false</self_collide>
+    </model>
+    <model name='A_letter'>
+      <include>
+        <uri>file:///home/habibahassan/.gazebo/models/A_letter</uri>
+      </include>
+      <pose>1.3055003881454468 0.14552564918994904 1.0242500305175781 0 0 -3.1411853071795868</pose>
+      <static>true</static>
+      <self_collide>false</self_collide>
+    </model>
+    <model name='A_letter2'>
+      <include>
+        <uri>file:///home/habibahassan/.gazebo/models/A_letter</uri>
+      </include>
+      <pose>1.3768199682235718 0.14552564918994904 1.0242500305175781 0 0 -3.1411853071795868</pose>
+      <static>true</static>
+      <self_collide>false</self_collide>
+    </model>
+    <model name='A_letter3'>
+      <include>
+        <uri>file:///home/habibahassan/.gazebo/models/A_letter</uri>
+      </include>
+      <pose>1.3768199682235718 -0.15193399786949158 1.0242500305175781 0 0 -3.1411853071795868</pose>
+      <static>true</static>
+      <self_collide>false</self_collide>
+    </model>
+    <model name='B_letter'>
+      <include>
+        <uri>file:///home/habibahassan/.gazebo/models/B_letter</uri>
+      </include>
+      <pose>1.2276605367660522 -0.15193399786949158 1.0242500305175781 0 0 -3.1411853071795868</pose>
+      <static>true</static>
+      <self_collide>false</self_collide>
+    </model>
+    <model name='B_letter2'>
+      <include>
+        <uri>file:///home/habibahassan/.gazebo/models/B_letter</uri>
+      </include>
+      <pose>1.2276605367660522 0.14552564918994904 1.0242500305175781 0 0 -3.1411853071795868</pose>
+      <static>true</static>
+      <self_collide>false</self_collide>
+    </model>
+    <model name='B_letter3'>
+      <include>
+        <uri>file:///home/habibahassan/.gazebo/models/B_letter</uri>
+      </include>
+      <pose>1.1604841947555542 0.14552564918994904 1.0242500305175781 0 0 -3.1411853071795868</pose>
+      <static>true</static>
+      <self_collide>false</self_collide>
+    </model>
+    <model name='C_letter'>
+      <include>
+        <uri>file:///home/habibahassan/.gazebo/models/C_letter</uri>
+      </include>
+      <pose>0.8560289740562439 -0.15193399786949158 1.0242530107498169 0 0 -3.1411853071795868</pose>
+      <static>true</static>
+      <self_collide>false</self_collide>
+    </model>
+    <model name='C_letter2'>
+      <include>
+        <uri>file:///home/habibahassan/.gazebo/models/C_letter</uri>
+      </include>
+      <pose>0.90930110216140747 0.14552564918994904 1.0242500305175781 0 0 -3.1411853071795868</pose>
+      <static>true</static>
+      <self_collide>false</self_collide>
+    </model>
+    <model name='C_letter3'>
+      <include>
+        <uri>file:///home/habibahassan/.gazebo/models/C_letter</uri>
+      </include>
+      <pose>0.83170175552368164 0.14552564918994904 1.0242500305175781 0 0 -3.1411853071795868</pose>
+      <static>true</static>
       <self_collide>false</self_collide>
     </model>
     <model name='IVStand'>
       <include>
         <uri>file:///home/habibahassan/.gazebo/models/IVStand</uri>
       </include>
-      <pose>-3.4603030684108265 1.0066000158677575 0.00066896047900204519 7.7348799653635384e-06 -5.3738700962429344e-06 2.1819400388173697e-09</pose>
+      <pose>-3.4603030681610107 1.006600022315979 0 0 0 0</pose>
       <static>false</static>
       <self_collide>false</self_collide>
     </model>
@@ -118,7 +190,7 @@
       <include>
         <uri>file:///home/habibahassan/.gazebo/models/BPCart</uri>
       </include>
-      <pose>-3.4405167102770906 2.8725559711443407 0.0034458880696220783 1.4462125198490827e-09 2.0303500637718513e-14 0.99320003590793904</pose>
+      <pose>-3.4405167102813716 2.8725559711456299 0 0 0 0.99320003590794281</pose>
       <static>false</static>
       <self_collide>false</self_collide>
     </model>
@@ -150,7 +222,7 @@
       <include>
         <uri>file:///home/habibahassan/.gazebo/models/red_plastic_cup</uri>
       </include>
-      <pose>0.88751487314155286 1.2152067544497509 1.1082690472712595 0.024793612305369132 -0.11920867513308894 0.02121419512914334</pose>
+      <pose>0.88749998807907104 1.2151999473571777 1.0800000000000001 0 0 0</pose>
       <static>false</static>
       <self_collide>false</self_collide>
     </model>
@@ -158,7 +230,7 @@
       <include>
         <uri>file:///home/habibahassan/.gazebo/models/green_plastic_cup</uri>
       </include>
-      <pose>1.148931338628395 1.2950325237360625 1.1053001488172356 1.8152582114127458e-05 -1.8978331803208298e-05 -0.0011531325289309583</pose>
+      <pose>1.1489400000000001 1.2950219999999999 1.0889530000000001 0 0 0</pose>
       <static>false</static>
       <self_collide>false</self_collide>
     </model>
@@ -166,7 +238,7 @@
       <include>
         <uri>file:///home/habibahassan/.gazebo/models/blue_plastic_cup</uri>
       </include>
-      <pose>1.4265158460825498 1.2172894448851186 1.0728000930921819 -3.567649859973075e-07 -1.8554070193920689e-06 -0.22894363566395884</pose>
+      <pose>1.4265000000000001 1.2173 1.0728 0 0 0</pose>
       <static>false</static>
       <self_collide>false</self_collide>
     </model>
@@ -174,7 +246,7 @@
       <include>
         <uri>file:///home/habibahassan/.gazebo/models/yellow_plastic_cup</uri>
       </include>
-      <pose>0.9534718622290137 1.4408418540460322 1.1067752405538387 0.043641679121285352 -0.15571982824683858 -0.058388463491724912</pose>
+      <pose>0.95346999168395996 1.4409999847412109 1.0800000000000001 0 0 0</pose>
       <static>false</static>
       <self_collide>false</self_collide>
     </model>
@@ -182,12 +254,60 @@
       <include>
         <uri>file:///home/habibahassan/.gazebo/models/purple_plastic_cup</uri>
       </include>
-      <pose>1.3496863714124816 1.4071175597373917 1.1080994627589955 0.026583242606947957 0.12871593537407075 -0.018941181094157877</pose>
+      <pose>1.3496899604797363 1.406999945640564 1.0800000000000001 0 0 0</pose>
+      <static>false</static>
+      <self_collide>false</self_collide>
+    </model>
+    <model name='GearA'>
+      <include>
+        <uri>file:///home/habibahassan/.gazebo/models/gear_part</uri>
+      </include>
+      <pose>1.4190095663070679 -0.042254101485013962 1.1923099756240845 0 0 0</pose>
+      <static>false</static>
+      <self_collide>false</self_collide>
+    </model>
+    <model name='GearB'>
+      <include>
+        <uri>file:///home/habibahassan/.gazebo/models/gear_part</uri>
+      </include>
+      <pose>1.112821698188782 -0.036935117095708847 1.1923099756240845 0 0 -3.1411900000053885</pose>
+      <static>false</static>
+      <self_collide>false</self_collide>
+    </model>
+    <model name='GearC'>
+      <include>
+        <uri>file:///home/habibahassan/.gazebo/models/gear_part</uri>
+      </include>
+      <pose>0.83913415670394897 -0.051404986530542374 1.1923099756240845 0 0 -3.1411900000053885</pose>
+      <static>false</static>
+      <self_collide>false</self_collide>
+    </model>
+    <model name='GearAA'>
+      <include>
+        <uri>file:///home/habibahassan/.gazebo/models/gear_part</uri>
+      </include>
+      <pose>1.4302164316177366 0.2153588384389877 1.1923099756240845 0 0 -3.1411900000053885</pose>
+      <static>false</static>
+      <self_collide>false</self_collide>
+    </model>
+    <model name='GearBB'>
+      <include>
+        <uri>file:///home/habibahassan/.gazebo/models/gear_part</uri>
+      </include>
+      <pose>1.1308468580245972 0.21925607323646545 1.1923099756240845 0 0 -3.1411900000053885</pose>
+      <static>false</static>
+      <self_collide>false</self_collide>
+    </model>
+    <model name='GearCC'>
+      <include>
+        <uri>file:///home/habibahassan/.gazebo/models/gear_part</uri>
+      </include>
+      <pose>0.8287709355354308 0.2093738317489624 1.1923099756240845 0 0 -3.1411900000053885</pose>
       <static>false</static>
       <self_collide>false</self_collide>
     </model>
     <model name='CylinderTable'>
-      <pose>1.0613498007489151 0.73380497916858112 0.49999916004197842 6.7150085010451323e-09 -1.704883990461741e-07 -4.0970545368176946e-08</pose>
+      <pose>1.0613499879837036 0.73380500078201294 0.49915310740470886 0 0 0</pose>
       <link name='cylinder_link'>
         <inertial>
           <inertia>
@@ -198,7 +318,7 @@
             <iyz>0</iyz>
             <izz>0.040000000000000001</izz>
           </inertia>
-          <mass>0.80000000000000004</mass>
+          <mass>3</mass>
           <pose>0 0 0 0 0 0</pose>
         </inertial>
         <collision name='cylinder_collision'>
@@ -236,7 +356,7 @@
       <self_collide>false</self_collide>
     </model>
     <model name='RoboticArmBase'>
-      <pose>1.0613498271829835 0.73380000712025228 1.0499989531867715 -1.8879927522797817e-06 4.0095446469683059e-06 -7.4101112918598737e-07</pose>
+      <pose>1.0613499879837036 0.73379999399185181 1.05 0 0 0</pose>
       <link name='box_link'>
         <inertial>
           <inertia>
@@ -247,7 +367,7 @@
             <iyz>0</iyz>
             <izz>0.041660000000000003</izz>
           </inertia>
-          <mass>0.5</mass>
+          <mass>1</mass>
           <pose>0 0 0 0 0 0</pose>
         </inertial>
         <collision name='box_collision'>
@@ -282,11 +402,6 @@
       <static>false</static>
       <self_collide>false</self_collide>
     </model>
-    <include>
-      <uri>file://<urdf-string></uri>
-      <name>ur</name>
-      <pose>8.8817841970012523e-16 4.4408920985006262e-16 0 0 0 2.5410988417629018e-21</pose>
-    </include>
     <light name='sun' type='directional'>
       <pose>0 0 10 0 0 0</pose>
       <cast_shadows>true</cast_shadows>

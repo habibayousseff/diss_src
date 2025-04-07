@@ -100,12 +100,88 @@
     </model>
     <model name='Tray2'>
       <include>
-        <uri>file:///home/habibahassan/.gazebo/models/tray</uri>
+        <uri>file:///home/habibahassan/.gazebo/models/traySlots</uri>
       </include>
       <pose>1.1056499481201174 0.082587398588657379 1.0144892930984497 0 0 1.57</pose>
       <static>false</static>
       <self_collide>false</self_collide>
     </model>
+
+    <model name='A_letter'>
+      <include>
+        <uri>file:///home/habibahassan/.gazebo/models/A_letter</uri>
+      </include>
+      <pose>1.3055003881454468 0.14552564918994904 1.0242500305175781 0 0 3.142</pose>
+      <static>true</static>
+      <self_collide>false</self_collide>
+    </model>
+    <model name='A_letter2'>
+      <include>
+        <uri>file:///home/habibahassan/.gazebo/models/A_letter</uri>
+      </include>
+      <pose>1.3768199682235718 0.14552564918994904 1.0242500305175781 0 0 3.142</pose>
+      <static>true</static>
+      <self_collide>false</self_collide>
+    </model>
+    <model name='A_letter3'>
+      <include>
+        <uri>file:///home/habibahassan/.gazebo/models/A_letter</uri>
+      </include>
+      <pose>1.3768199682235718 -0.15193399786949158 1.0242500305175781 0 0 3.142</pose>
+      <static>true</static>
+      <self_collide>false</self_collide>
+    </model>
+    
+    <model name='B_letter'>
+      <include>
+        <uri>file:///home/habibahassan/.gazebo/models/B_letter</uri>
+      </include>
+      <pose>1.2276605367660522 -0.15193399786949158 1.0242500305175781 0 0 3.142</pose>
+      <static>true</static>
+      <self_collide>false</self_collide>
+    </model>
+    <model name='B_letter2'>
+      <include>
+        <uri>file:///home/habibahassan/.gazebo/models/B_letter</uri>
+      </include>
+      <pose>1.2276605367660522 0.14552564918994904 1.0242500305175781 0 0 3.142</pose>
+      <static>true</static>
+      <self_collide>false</self_collide>
+    </model>
+    <model name='B_letter3'>
+      <include>
+        <uri>file:///home/habibahassan/.gazebo/models/B_letter</uri>
+      </include>
+      <pose>1.1604841947555542 0.14552564918994904 1.0242500305175781 0 0 3.142</pose>
+      <static>true</static>
+      <self_collide>false</self_collide>
+    </model>
+
+    <model name='C_letter'>
+      <include>
+        <uri>file:///home/habibahassan/.gazebo/models/C_letter</uri>
+      </include>
+      <pose>0.8560289740562439 -0.15193399786949158 1.0242530107498169 0 0 3.142</pose>
+      <static>true</static>
+      <self_collide>false</self_collide>
+    </model>
+    <model name='C_letter2'>
+      <include>
+        <uri>file:///home/habibahassan/.gazebo/models/C_letter</uri>
+      </include>
+      <pose>0.90930110216140747 0.14552564918994904 1.0242500305175781 0 0 3.142</pose>
+      <static>true</static>
+      <self_collide>false</self_collide>
+    </model>
+    <model name='C_letter3'>
+      <include>
+        <uri>file:///home/habibahassan/.gazebo/models/C_letter</uri>
+      </include>
+      <pose>0.83170175552368164 0.14552564918994904 1.0242500305175781 0 0 3.142</pose>
+      <static>true</static>
+      <self_collide>false</self_collide>
+    </model>
+
     <model name='IVStand'>
       <include>
         <uri>file:///home/habibahassan/.gazebo/models/IVStand</uri>
@@ -150,7 +226,7 @@
       <include>
         <uri>file:///home/habibahassan/.gazebo/models/red_plastic_cup</uri>
       </include>
-      <pose>0.88749998807907104 1.2151999473571777 1.0728 0 0 0</pose>
+      <pose>0.88749998807907104 1.2151999473571777 1.08 0 0 0</pose>
       <static>false</static>
       <self_collide>false</self_collide>
     </model>
@@ -174,7 +250,7 @@
       <include>
         <uri>file:///home/habibahassan/.gazebo/models/yellow_plastic_cup</uri>
       </include>
-      <pose>0.95346999168395996 1.4409999847412109 1.0728 0 0 0</pose>
+      <pose>0.95346999168395996 1.4409999847412109 1.08 0 0 0</pose>
       <static>false</static>
       <self_collide>false</self_collide>
     </model>
@@ -182,7 +258,7 @@
       <include>
         <uri>file:///home/habibahassan/.gazebo/models/purple_plastic_cup</uri>
       </include>
-      <pose>1.3496899604797363 1.406999945640564 1.0728 0 0 0</pose>
+      <pose>1.3496899604797363 1.406999945640564 1.08 0 0 0</pose>
       <static>false</static>
       <self_collide>false</self_collide>
     </model>
@@ -198,7 +274,7 @@
             <iyz>0</iyz>
             <izz>0.040000000000000001</izz>
           </inertia>
-          <mass>0.80000000000000004</mass>
+          <mass>3.0</mass>
           <pose>0 0 0 0 0 0</pose>
         </inertial>
         <collision name='cylinder_collision'>
@@ -247,7 +323,7 @@
             <iyz>0</iyz>
             <izz>0.041660000000000003</izz>
           </inertia>
-          <mass>0.5</mass>
+          <mass>1.0</mass>
           <pose>0 0 0 0 0 0</pose>
         </inertial>
         <collision name='box_collision'>
