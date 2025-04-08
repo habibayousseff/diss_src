@@ -349,14 +349,14 @@ def generate_launch_description():
 
     llm_node = Node(
         package="move_program",
-        executable="unified_llm_nav.py",
+        executable="llm_node.py",
         output="screen",
     )
     ld.add_action(llm_node)
 
     link_attacher_node = Node(
         package="move_program",
-        executable="unified_llm_nav.py",
+        executable="llm_node.py",
         output="screen",
     )
     ld.add_action(link_attacher_node)

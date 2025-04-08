@@ -111,7 +111,7 @@
       <include>
         <uri>file:///home/habibahassan/.gazebo/models/A_letter</uri>
       </include>
-      <pose>1.3055003881454468 0.14552564918994904 1.0242500305175781 0 0 3.142</pose>
+      <pose>1.2838039398193359 0.14551727473735809 1.0271300077438354 0 0 -3.1411900000053885</pose>
       <static>true</static>
       <self_collide>false</self_collide>
     </model>
@@ -119,7 +119,7 @@
       <include>
         <uri>file:///home/habibahassan/.gazebo/models/A_letter</uri>
       </include>
-      <pose>1.3768199682235718 0.14552564918994904 1.0242500305175781 0 0 3.142</pose>
+      <pose>1.3768199682235718 0.14552564918994904 1.0271300077438354 0 0 -3.1411853071795868</pose>
       <static>true</static>
       <self_collide>false</self_collide>
     </model>
@@ -127,16 +127,16 @@
       <include>
         <uri>file:///home/habibahassan/.gazebo/models/A_letter</uri>
       </include>
-      <pose>1.3768199682235718 -0.15193399786949158 1.0242500305175781 0 0 3.142</pose>
+      <pose>1.3421275615692139 -0.12415596097707748 1.0271300077438354 0 0 -3.1411900000053885</pose>
       <static>true</static>
       <self_collide>false</self_collide>
     </model>
-    
+
     <model name='B_letter'>
       <include>
         <uri>file:///home/habibahassan/.gazebo/models/B_letter</uri>
       </include>
-      <pose>1.2276605367660522 -0.15193399786949158 1.0242500305175781 0 0 3.142</pose>
+      <pose>1.2106491327285767 -0.13198883831501007 1.0271300077438354 0 0 -3.1411900000053885</pose>
       <static>true</static>
       <self_collide>false</self_collide>
     </model>
@@ -144,7 +144,7 @@
       <include>
         <uri>file:///home/habibahassan/.gazebo/models/B_letter</uri>
       </include>
-      <pose>1.2276605367660522 0.14552564918994904 1.0242500305175781 0 0 3.142</pose>
+      <pose>1.2276605367660522 0.14552564918994904 1.0271300077438354 0 0 -3.1411853071795868</pose>
       <static>true</static>
       <self_collide>false</self_collide>
     </model>
@@ -152,7 +152,7 @@
       <include>
         <uri>file:///home/habibahassan/.gazebo/models/B_letter</uri>
       </include>
-      <pose>1.1604841947555542 0.14552564918994904 1.0242500305175781 0 0 3.142</pose>
+      <pose>1.132475733757019 0.14551472663879395 1.0242500305175781 0 0 -3.1411900000053885</pose>
       <static>true</static>
       <self_collide>false</self_collide>
     </model>
@@ -161,7 +161,7 @@
       <include>
         <uri>file:///home/habibahassan/.gazebo/models/C_letter</uri>
       </include>
-      <pose>0.8560289740562439 -0.15193399786949158 1.0242530107498169 0 0 3.142</pose>
+      <pose>0.89987587928771973 -0.1404619961977005 1.0271300077438354 0 0 -3.1411900000053885</pose>
       <static>true</static>
       <self_collide>false</self_collide>
     </model>
@@ -169,7 +169,7 @@
       <include>
         <uri>file:///home/habibahassan/.gazebo/models/C_letter</uri>
       </include>
-      <pose>0.90930110216140747 0.14552564918994904 1.0242500305175781 0 0 3.142</pose>
+      <pose>0.92359393835067749 0.14553175866603851 1.0271300077438354 0 0 -3.1411900000053885</pose>
       <static>true</static>
       <self_collide>false</self_collide>
     </model>
@@ -177,7 +177,7 @@
       <include>
         <uri>file:///home/habibahassan/.gazebo/models/C_letter</uri>
       </include>
-      <pose>0.83170175552368164 0.14552564918994904 1.0242500305175781 0 0 3.142</pose>
+      <pose>0.83170175552368164 0.14552564918994904 1.0271300077438354 0 0 -3.1411853071795868</pose>
       <static>true</static>
       <self_collide>false</self_collide>
     </model>

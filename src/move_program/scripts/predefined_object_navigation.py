@@ -36,6 +36,34 @@ OBJECT_GOALS = {
         "position": [1.168, 1.466, 1.27],
         "orientation": [0.714, 0.699, -0.032, -0.041]
     },
+    "Up": {
+        "position": [1.061, 0.542, 2.101],
+        "orientation": [0.000, 0.707, 0.707, -0.000]
+    },
+    "A": {
+        "position": [1.449, -0.026, 1.279], # done
+        "orientation": [-0.044, 0.999, 0.009, -0.001]
+    },
+    "B": {
+        "position": [1.143, -0.038, 1.279], # done
+        "orientation": [-0.055, 0.999, 0.009, -0.000]
+    },
+    "C": {
+        "position": [0.815, -0.018, 1.280], # done
+        "orientation": [-0.006, 0.999, 0.009, -0.001]
+    },
+    "AA": {
+        "position": [1.474, 0.240, 1.283], # done
+        "orientation": [-0.056, 0.999, 0.009, -0.000]
+    },
+    "BB": {
+        "position": [1.111, 0.254, 1.3], # done
+        "orientation": [-0.055, 0.998, -0.030, -0.002]
+    },
+    "CC": {
+        "position": [0.812, 0.252, 1.285], # done
+        "orientation": [-0.006, 0.999, 0.009, -0.001]
+    },
 }
 
 class PredefinedObjectClient(Node):
@@ -65,7 +93,7 @@ class PredefinedObjectClient(Node):
         goal_msg = MoveGroup.Goal()
         request = MotionPlanRequest()
         request.group_name = "ur_manipulator"
-        request.allowed_planning_time = 5.0
+        request.allowed_planning_time = 20.0
         request.max_velocity_scaling_factor = 0.7
         request.max_acceleration_scaling_factor = 0.7
 

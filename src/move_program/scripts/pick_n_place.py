@@ -58,45 +58,62 @@ PLACE_GOAL = {
         "orientation": [0.000, 0.707, 0.707, -0.000]
     },
     "A": {
-        "position": [1.42, -0.042, 1.1923],
+        "position": [1.42, -0.042, 1.35],
         "orientation": [-0.041, 0.999, -0.002, -0.006]
     },
     "B": {
-        "position": [1.113, -0.037, 1.1923],
+        "position": [1.113, -0.037, 1.35],
         "orientation": [-0.041, 0.999, -0.002, -0.006]
     },
     "C": {
-        "position": [0.839, -0.0514, 1.1923],
+        "position": [0.839, -0.0514, 1.35],
         "orientation": [-0.041, 0.999, -0.002, -0.006]
     },
     "AA": {
-        "position": [1.43, 0.215, 1.1923],
+        "position": [1.43, 0.215, 1.35],
         "orientation": [-0.041, 0.999, -0.002, -0.006]
     },
     "BB": {
-        "position": [1.131, 0.22, 1.1923],
+        "position": [1.131, 0.22, 1.35],
         "orientation": [-0.041, 0.999, -0.002, -0.006]
     },
     "CC": {
-        "position": [0.83, 0.21, 1.1923],
+        "position": [0.83, 0.21, 1.35],
         "orientation": [-0.041, 0.999, -0.002, -0.006]
     },
-    
 }
 
 GRIPPER_OPEN  = 0.004
 GRIPPER_CLOSE = 0.08
 GRIPPER_MIDDLE = 0.06
 
+def moveit_error_string(code):
+    error_map = {
+        1: "SUCCESS",
+        -1: "FAILURE",
+        -2: "PLANNING_FAILED",
+        -3: "INVALID_MOTION_PLAN",
+        -4: "MOTION_PLAN_INVALIDATED_BY_ENVIRONMENT_CHANGE",
+        -5: "CONTROL_FAILED",
+        -6: "UNABLE_TO_AQUIRE_SENSOR_DATA",
+        -7: "TIMED_OUT",
+        -10: "START_STATE_IN_COLLISION",
+        -11: "START_STATE_VIOLATES_PATH_CONSTRAINTS",
+    }
+    return error_map.get(code, "UNKNOWN")
+
 class PickAndPlaceObject(Node):
-    def __init__(self, goal_name):
+    def __init__(self, goal_name, place_location):
         super().__init__('pick_and_place_object_node')
         self._goal_name = goal_name
+        self._place_location = place_location
 
         self._move_client = ActionClient(self, MoveGroup, '/move_action')
         self._exec_client = ActionClient(self, ExecuteTrajectory, '/execute_trajectory')
         self._gripper_client = ActionClient(self, GripperCommand, 'gripper_controller/gripper_cmd')
         self._done = False
+
+    # ------------------- your functions below here are untouched -------------------
 
     def send_pick_and_place(self):
         self.get_logger().info("Waiting for action servers...")
@@ -112,12 +129,24 @@ class PickAndPlaceObject(Node):
         pick_data = OBJECT_GOALS[self._goal_name]
         pick_pos = pick_data["position"]
         pick_orient = pick_data["orientation"]
+        
+        if self._place_location not in PLACE_GOAL:
+            self.get_logger().error(f"Goal '{self._place_location}' not found in PLACE_GOALS!")
+            self._done = True
+            return
+
+        place_data = PLACE_GOAL[self._place_location]
+        place_pos = place_data["position"]
+        place_orient = place_data["orientation"]
 
         self.open_gripper()
         time.sleep(2)
 
         approach_pos_pick = pick_pos.copy()
         approach_pos_pick[2] += 0.097
+        
+        approach_pos_place = place_pos.copy()
+        approach_pos_place[2] += 0.097
 
         self.get_logger().info("1. Move above object (approach pose).")
         if not self.move_ee_to_pose(approach_pos_pick, pick_orient, max_attempts=25):
@@ -141,15 +170,19 @@ class PickAndPlaceObject(Node):
             return
         time.sleep(2)
 
-        self.get_logger().info("5. Move to intermediate place pose (TestConfig).")
+        self.get_logger().info("5. Move to intermediate place pose.")
         place_test = PLACE_GOAL["TestConfig"]
         if not self.move_ee_to_pose(place_test["position"], place_test["orientation"], max_attempts=25):
             self.abort("TestConfig place pose failed.")
             return
         time.sleep(2)
 
-        self.get_logger().info("6. Move to final place pose (TrialPlaceGoal).")
-        place_final = PLACE_GOAL["TrialPlaceGoal"]
+        self.get_logger().info(f"6. Move to final place pose ({self._place_location}).")
+        if self._place_location not in PLACE_GOAL:
+            self.abort(f"Place location '{self._place_location}' not in PLACE_GOAL!")
+            return
+
+        place_final = PLACE_GOAL[self._place_location]
         if not self.move_ee_to_pose(place_final["position"], place_final["orientation"], max_attempts=25):
             self.abort("Final place pose failed.")
             return
@@ -158,14 +191,13 @@ class PickAndPlaceObject(Node):
         self.get_logger().info("7. Open gripper to release.")
         self.mid_gripper()
         time.sleep(2)
-        
-        self.get_logger().info("8. Move to intermediate place pose (TestConfig).")
-        place_test = PLACE_GOAL["TestConfig"]
-        if not self.move_ee_to_pose(place_test["position"], place_test["orientation"], max_attempts=25):
-            self.abort("TestConfig place pose failed.")
+
+        self.get_logger().info("8. Lift arm.")
+        if not self.move_ee_to_pose(approach_pos_place, place_orient, max_attempts=25):
+            self.abort("Lift motion failed.")
             return
         time.sleep(2)
-        
+
         self.get_logger().info("9. Move to start position.")
         place_test = PLACE_GOAL["Up"]
         if not self.move_ee_to_pose(place_test["position"], place_test["orientation"], max_attempts=25):
@@ -183,7 +215,7 @@ class PickAndPlaceObject(Node):
     def open_gripper(self):
         self.set_gripper_position(GRIPPER_OPEN, max_effort=100.0)
         self.get_logger().info("Gripper opened.\n")
-    
+
     def mid_gripper(self):
         self.set_gripper_position(GRIPPER_MIDDLE, max_effort=100.0)
         self.get_logger().info("Gripper opened.\n")
@@ -203,8 +235,7 @@ class PickAndPlaceObject(Node):
             return
 
         start_time = time.time()
-        timeout = 60  # seconds
-
+        timeout = 60
         result_future = goal_handle.get_result_async()
 
         while rclpy.ok() and not result_future.done():
@@ -221,7 +252,7 @@ class PickAndPlaceObject(Node):
         else:
             self.get_logger().warn("Gripper did not reach goal, but did not stall either.")
 
-        time.sleep(2)  # Still useful for stability
+        time.sleep(2)
 
     def set_gripper_position(self, position, max_effort=100.0):
         goal_msg = GripperCommand.Goal()
@@ -252,7 +283,6 @@ class PickAndPlaceObject(Node):
 
         constraints = Constraints()
 
-        # === PositionConstraint for tool0 (target pose) ===
         pc = PositionConstraint()
         pc.header.frame_id = "world"
         pc.link_name = "tool0"
@@ -272,7 +302,6 @@ class PickAndPlaceObject(Node):
         pc.constraint_region.primitive_poses.append(target_pose)
         constraints.position_constraints.append(pc)
 
-        # === NEW: Z constraint for upper_arm_link (Z between 1.25 and 3.0) ===
         arm_constraint = PositionConstraint()
         arm_constraint.header.frame_id = "world"
         arm_constraint.link_name = "forearm_link"
@@ -280,19 +309,17 @@ class PickAndPlaceObject(Node):
 
         z_box = SolidPrimitive()
         z_box.type = SolidPrimitive.BOX
-        z_box.dimensions = [10.0, 10.0, 1.75]  # X, Y, Z size (large XY, Z from 1.25 to 3.0)
-
+        z_box.dimensions = [10.0, 10.0, 1.75]
         z_box_pose = Pose()
         z_box_pose.position.x = 0.0
         z_box_pose.position.y = 0.0
-        z_box_pose.position.z = 2.125  # Center of box = 1.25 + 1.75 / 2
+        z_box_pose.position.z = 2.125
         z_box_pose.orientation.w = 1.0
 
         arm_constraint.constraint_region.primitives.append(z_box)
         arm_constraint.constraint_region.primitive_poses.append(z_box_pose)
         constraints.position_constraints.append(arm_constraint)
 
-        # === OrientationConstraint for tool0 ===
         oc = OrientationConstraint()
         oc.header.frame_id = "world"
         oc.link_name = pc.link_name
@@ -320,7 +347,6 @@ class PickAndPlaceObject(Node):
             self.get_logger().info(
                 f"Attempt {attempt + 1} of {max_attempts}: Planning to ({position[0]:.3f}, {position[1]:.3f}, {position[2]:.3f})"
             )
-
             future = self._move_client.send_goal_async(goal_msg, feedback_callback=self.feedback_cb)
             rclpy.spin_until_future_complete(self, future)
             goal_handle = future.result()
@@ -340,8 +366,11 @@ class PickAndPlaceObject(Node):
                 self.get_logger().info("Motion plan + execution succeeded!\n")
                 return True
             else:
+                # self.get_logger().warn(
+                #     f"Motion failed with error code: {result_msg.result.error_code.val if result_msg else 'No result'}"
+                # )
                 self.get_logger().warn(
-                    f"Motion failed with error code: {result_msg.result.error_code.val if result_msg else 'No result'}"
+                    f"Planning failed with error code: {result_msg.result.error_code.val} — {moveit_error_string(result_msg.result.error_code.val)}"
                 )
                 attempt += 1
                 time.sleep(0.5)
@@ -349,19 +378,22 @@ class PickAndPlaceObject(Node):
         self.get_logger().error("All planning attempts failed.\n")
         return False
 
-
     def feedback_cb(self, feedback):
         self.get_logger().debug(f"Feedback: {feedback.feedback}")
-
+    
 def main(args=None):
     rclpy.init(args=args)
 
     goal_name = "RedCup"
+    place_location = "BB"
+
     for arg in sys.argv:
         if "goal:=" in arg:
             goal_name = arg.split(":=")[1]
+        if "place:=" in arg:
+            place_location = arg.split(":=")[1]
 
-    node = PickAndPlaceObject(goal_name)
+    node = PickAndPlaceObject(goal_name, place_location)
     node.send_pick_and_place()
 
     while rclpy.ok() and not node._done:

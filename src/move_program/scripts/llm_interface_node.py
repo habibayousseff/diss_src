@@ -21,7 +21,7 @@ class LLMInterfaceNode(Node):
         super().__init__('llm_interface_node')
         # Set your OpenAI API key here or via env var
         # openai.api_key = os.getenv("OPENAI_API_KEY", "sk-REPLACE_THIS")
-        openai.api_key = "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"
+        openai.api_key = "sk- .."
 
 
         self.get_logger().info("LLM Interface Node started. Type commands in console...")
