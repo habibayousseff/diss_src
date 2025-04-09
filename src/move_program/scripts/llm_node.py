@@ -2,6 +2,7 @@
 # import os
 # import sys
 # import time
+# import re
 
 # import rclpy
 # from rclpy.node import Node
@@ -175,22 +176,31 @@
 #         place_pos = place_data["position"]
 #         place_orient = place_data["orientation"]
 
-#         # 1) go to above the place position
 #         approach_place = place_pos.copy()
 #         approach_place[2] += 0.097
+        
+#         # 1) Move up to the "safe" pose (TestConfig)
+#         # if not self.move_ee_to_pose(PLACE_GOAL["TestConfig"]["position"],
+#         #                             PLACE_GOAL["TestConfig"]["orientation"]):
+#         #     return False
+#         # time.sleep(2)
+        
+#         # 2) go to above the place position
+#         self.get_logger().info(f"AA pose: {place_pos}, approach: {approach_place}")
 #         if not self.move_ee_to_pose(approach_place, place_orient):
 #             return False
 #         time.sleep(2)
 
-#         # 2) Descend to final place
+#         # 3) Descend to final place
 #         if not self.move_ee_to_pose(place_pos, place_orient):
 #             return False
 #         time.sleep(2)
 
-#         # 3) Open the gripper
+#         # 4) Open the gripper
 #         self.mid_gripper()
 #         time.sleep(2)
-
+        
+#         # 5) move above the place position again
 #         if not self.move_ee_to_pose(approach_place, place_orient):
 #             return False
 #         time.sleep(2)
@@ -307,7 +317,7 @@
 #         z_box_pose = Pose()
 #         z_box_pose.position.x = 0.0
 #         z_box_pose.position.y = 0.0
-#         z_box_pose.position.z = 2.125
+#         z_box_pose.position.z = 2.3
 #         z_box_pose.orientation.w = 1.0
 
 #         arm_constraint.constraint_region.primitives.append(z_box)
@@ -377,24 +387,93 @@
 #      - If it indicates “pick and place,” do both in sequence.
 #      - If the user only says “place,” we use the currently_held_item from a prior pick.
 #     """
+# class LLMAndNavNode(Node):
+#     # def __init__(self):
+#     #     super().__init__('llm_node')
 
+#     #     # For calling OpenAI
+#     #     openai.api_key = os.getenv("OPENAI_API_KEY", "sk- ..")
+#     #     self.get_logger().info("LLM node started")
+
+#     #     # We'll hold the name of the last item we picked (if any)
+#     #     self.currently_held_item = None
+
+#     #     # We'll create our pick/place manager node
+#     #     self.pick_place_mgr = PickAndPlaceManager()
+
+#     #     # Timer to poll user from the console every 5 seconds
+#     #     self.busy = False
+#     #     self.poll_timer = self.create_timer(5.0, self.poll_user)
+#     #     self.get_logger().info("Ready for user commands...")
 #     def __init__(self):
 #         super().__init__('llm_node')
 
 #         # For calling OpenAI
-#         openai.api_key = os.getenv("OPENAI_API_KEY", "sk- ..")
+#         openai.api_key = os.getenv("OPENAI_API_KEY")
 #         self.get_logger().info("LLM node started")
 
-#         # We'll hold the name of the last item we picked (if any)
 #         self.currently_held_item = None
-
-#         # We'll create our pick/place manager node
 #         self.pick_place_mgr = PickAndPlaceManager()
 
-#         # Timer to poll user from the console every 5 seconds
+#         # NEW: Chat memory and clarification flag
+#         self.chat_history = []
+#         self.awaiting_clarification = False
+
 #         self.busy = False
 #         self.poll_timer = self.create_timer(5.0, self.poll_user)
 #         self.get_logger().info("Ready for user commands...")
+
+#     # def poll_user(self):
+#     #     if self.busy:
+#     #         return
+#     #     self.busy = True
+#     #     try:
+#     #         user_text = input("\nCommand (e.g., 'Pick up the red cup' OR 'Place it in BB'): ").strip()
+#     #         if not user_text:
+#     #             return
+
+#     #         # 1) Query the LLM to interpret
+#     #         response = self.query_llm(user_text)
+#     #         self.get_logger().info(f"LLM response: {response}")
+
+#     #         # 2) From the LLM text, figure out if user wants pick and/or place
+#     #         do_pick = ("pick" in response.lower())
+#     #         do_place = ("place" in response.lower())
+
+#     #         # Extract color (which cup) from text (if any)
+#     #         color = self.extract_color(response)
+#     #         # Extract location (which place key) from text (if any)
+#     #         location = self.extract_location(response)
+
+#     #         # # Some defaults
+#     #         # if do_pick and not color:
+#     #         #     color = "RedCup"  # fallback color
+#     #         # if do_place and not location:
+#     #         #     location = "BB"   # fallback place
+
+#     #         if do_pick and do_place:
+#     #             # Example: "Pick up the green cup and place it on AA"
+#     #             self.do_pick_and_place(color, location)
+
+#     #         elif do_pick and not do_place:
+#     #             # Example: "Pick up the red cup" => pick only
+#     #             self.do_pick_only(color)
+
+#     #         elif do_place and not do_pick:
+#     #             # Example: "Place the item in CC"
+#     #             # Use the currently_held_item if user hasn't specified a color
+#     #             if not color:
+#     #                 color = self.currently_held_item
+
+#     #             self.do_place_only(color, location)
+#     #         else:
+#     #             # The user said something the LLM didn't interpret as pick or place
+#     #             self.get_logger().warn("No recognized pick/place action from LLM response.")
+
+#     #     except Exception as e:
+#     #         self.get_logger().error(f"Error in command: {e}")
+#     #     finally:
+#     #         self.busy = False
 
 #     def poll_user(self):
 #         if self.busy:
@@ -405,49 +484,40 @@
 #             if not user_text:
 #                 return
 
-#             # 1) Query the LLM to interpret
-#             response = self.query_llm(user_text)
+#             self.chat_history.append({"role": "user", "content": user_text})
+#             response = self.query_llm()
+#             self.chat_history.append({"role": "assistant", "content": response})
 #             self.get_logger().info(f"LLM response: {response}")
 
-#             # 2) From the LLM text, figure out if user wants pick and/or place
+#             # If LLM is asking a clarification question, wait for next input
+#             if response.strip().endswith("?"):
+#                 self.awaiting_clarification = True
+#                 return
+#             else:
+#                 self.awaiting_clarification = False
+
 #             do_pick = ("pick" in response.lower())
 #             do_place = ("place" in response.lower())
 
-#             # Extract color (which cup) from text (if any)
 #             color = self.extract_color(response)
-#             # Extract location (which place key) from text (if any)
 #             location = self.extract_location(response)
 
-#             # # Some defaults
-#             # if do_pick and not color:
-#             #     color = "RedCup"  # fallback color
-#             # if do_place and not location:
-#             #     location = "BB"   # fallback place
-
 #             if do_pick and do_place:
-#                 # Example: "Pick up the green cup and place it on AA"
 #                 self.do_pick_and_place(color, location)
-
 #             elif do_pick and not do_place:
-#                 # Example: "Pick up the red cup" => pick only
 #                 self.do_pick_only(color)
-
 #             elif do_place and not do_pick:
-#                 # Example: "Place the item in CC"
-#                 # Use the currently_held_item if user hasn't specified a color
 #                 if not color:
 #                     color = self.currently_held_item
-
 #                 self.do_place_only(color, location)
 #             else:
-#                 # The user said something the LLM didn't interpret as pick or place
 #                 self.get_logger().warn("No recognized pick/place action from LLM response.")
 
 #         except Exception as e:
 #             self.get_logger().error(f"Error in command: {e}")
 #         finally:
 #             self.busy = False
-
+            
 #     # --------------------------------------------------------------------------
 #     # Concrete methods to do pick or place
 #     # --------------------------------------------------------------------------
@@ -483,37 +553,62 @@
 #     # --------------------------------------------------------------------------
 #     # LLM handling
 #     # --------------------------------------------------------------------------
-#     def query_llm(self, user_text):
-#         """
-#         Send user_text to GPT-3.5 or GPT-4 to interpret. 
-#         In a real system, you'd craft the system prompt carefully to ensure
-#         the LLM response is short, e.g. "User wants to: pick or place. Cup color? Place location?"
-#         """
+    
+#     # def query_llm(self, user_text):
+#     #     """
+#     #     Send user_text to GPT-3.5 or GPT-4 to interpret. 
+#     #     In a real system, you'd craft the system prompt carefully to ensure
+#     #     the LLM response is short, e.g. "User wants to: pick or place. Cup color? Place location?"
+#     #     """
+#     #     try:
+#     #         resp = openai.chat.completions.create(
+#     #             model="gpt-3.5-turbo",
+#     #             messages=[
+#     #                 {
+#     #                     "role": "system",
+#     #                     "content": (
+#     #                         "You control a robot that can pick up and place colored cups. "
+#     #                         "Available cups: RedCup, GreenCup, BlueCup, YellowCup, PurpleCup. "
+#     #                         "Available places: A, B, C, AA, BB, CC, etc. "
+#     #                         "The user might say things like 'pick up the red cup' or 'place it in AA', or both. "
+#     #                         "Your job is to interpret their intent and respond with a short structured sentence including the keywords: 'pick', 'place', the color (e.g. 'red'), and the location (e.g. 'AA'). "
+#     #                         "Fix minor spelling mistakes in cup colors and locations. "
+#     #                         "If you are uncertain about the color or location, or the user's message is ambiguous, ask for clarification with a short question like: 'Did you mean the blue cup?' or 'Where should I place the cup?'. "
+#     #                         "Only ask one clarifying question at a time if needed."
+#     #                     )
+#     #                 },
+#     #                 {"role": "user", "content": user_text},
+#     #             ],
+#     #             temperature=0.0
+#     #         )
+#     #         return resp.choices[0].message.content
+#     #     except Exception as e:
+#     #         self.get_logger().error(f"LLM error: {str(e)}")
+#     #         return user_text  # fallback: just use user text
+        
+#     def query_llm(self):
 #         try:
 #             resp = openai.chat.completions.create(
 #                 model="gpt-3.5-turbo",
 #                 messages=[
-#                     {
-#                         "role": "system",
-#                         "content": (
-#                             "You control a robot that can pick up and place colored cups. "
-#                             "Available cups: RedCup, GreenCup, BlueCup, YellowCup, PurpleCup. "
-#                             "Available places: A, B, C, AA, BB, CC, etc. "
-#                             "The user might say things like 'pick up the red cup' or 'place it in AA', or both. "
-#                             "Your job is to interpret their intent and respond with a short structured sentence including the keywords: 'pick', 'place', the color (e.g. 'red'), and the location (e.g. 'AA'). "
-#                             "Fix minor spelling mistakes in cup colors and locations. "
-#                             "If you are uncertain about the color or location, or the user's message is ambiguous, ask for clarification with a short question like: 'Did you mean the blue cup?' or 'Where should I place the cup?'. "
-#                             "Only ask one clarifying question at a time if needed."
-#                         )
-#                     },
-#                     {"role": "user", "content": user_text},
+#                     {"role": "system", "content": (
+#                         "You control a robot that can pick up and place colored cups. "
+#                         "Available cups: RedCup, GreenCup, BlueCup, YellowCup, PurpleCup. "
+#                         "Available places: A, B, C, AA, BB, CC, etc. "
+#                         "The user might say things like 'pick up the red cup' or 'place it in AA', or both. "
+#                         "Your job is to interpret their intent and respond with a short structured sentence including the keywords: 'pick', 'place', the color (e.g. 'red'), and the location (e.g. 'AA'). "
+#                         "Fix minor spelling mistakes in cup colors and locations. "
+#                         "If you are uncertain about the color or location, or the user's message is ambiguous, ask for clarification with a short question like: 'Did you mean the blue cup?' or 'Where should I place the cup?'. "
+#                         "Only ask one clarifying question at a time if needed."
+#                     )},
+#                     *self.chat_history
 #                 ],
 #                 temperature=0.0
 #             )
 #             return resp.choices[0].message.content
 #         except Exception as e:
 #             self.get_logger().error(f"LLM error: {str(e)}")
-#             return user_text  # fallback: just use user text
+#             return "I'm sorry, something went wrong."
 
 #     def extract_color(self, text):
 #         """Look for known color words in the LLM response."""
@@ -523,15 +618,15 @@
 #                 # Return e.g. 'RedCup'
 #                 return c.capitalize() + "Cup"
 #         return None
-
+    
 #     def extract_location(self, text):
-#         """Look for a known location (A,B,C,AA,BB,CC, etc.) in the text."""
-#         for place in PLACE_GOAL.keys():
-#             # place is e.g. 'A', 'B', 'CC', 'HOME', etc.
-#             if place.lower() in text.lower():
+#         lower_text = text.lower()
+#         # Sort by length descending to match AA before A, BB before B
+#         for place in sorted(PLACE_GOAL.keys(), key=lambda x: -len(x)):
+#             pattern = r'\b' + re.escape(place.lower()) + r'\b'
+#             if re.search(pattern, lower_text):
 #                 return place
 #         return None
-
 
 # ###############################################################################
 # #                               MAIN
@@ -552,6 +647,45 @@
 
 # if __name__ == "__main__":
 #     main()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -809,7 +943,6 @@ class PickAndPlaceManager(Node):
         # time.sleep(2)
         
         # 2) go to above the place position
-        self.get_logger().info(f"AA pose: {place_pos}, approach: {approach_place}")
         if not self.move_ee_to_pose(approach_place, place_orient):
             return False
         time.sleep(2)
@@ -940,7 +1073,7 @@ class PickAndPlaceManager(Node):
         z_box_pose = Pose()
         z_box_pose.position.x = 0.0
         z_box_pose.position.y = 0.0
-        z_box_pose.position.z = 2.3
+        z_box_pose.position.z = 2.25
         z_box_pose.orientation.w = 1.0
 
         arm_constraint.constraint_region.primitives.append(z_box)
@@ -1011,28 +1144,11 @@ class LLMAndNavNode(Node):
      - If the user only says “place,” we use the currently_held_item from a prior pick.
     """
 class LLMAndNavNode(Node):
-    # def __init__(self):
-    #     super().__init__('llm_node')
-
-    #     # For calling OpenAI
-    #     openai.api_key = os.getenv("OPENAI_API_KEY", "sk- ..")
-    #     self.get_logger().info("LLM node started")
-
-    #     # We'll hold the name of the last item we picked (if any)
-    #     self.currently_held_item = None
-
-    #     # We'll create our pick/place manager node
-    #     self.pick_place_mgr = PickAndPlaceManager()
-
-    #     # Timer to poll user from the console every 5 seconds
-    #     self.busy = False
-    #     self.poll_timer = self.create_timer(5.0, self.poll_user)
-    #     self.get_logger().info("Ready for user commands...")
     def __init__(self):
         super().__init__('llm_node')
 
         # For calling OpenAI
-        openai.api_key = os.getenv("OPENAI_API_KEY", "sk- ..")
+        openai.api_key = os.getenv("OPENAI_API_KEY")
         self.get_logger().info("LLM node started")
 
         self.currently_held_item = None
@@ -1045,58 +1161,6 @@ class LLMAndNavNode(Node):
         self.busy = False
         self.poll_timer = self.create_timer(5.0, self.poll_user)
         self.get_logger().info("Ready for user commands...")
-
-    # def poll_user(self):
-    #     if self.busy:
-    #         return
-    #     self.busy = True
-    #     try:
-    #         user_text = input("\nCommand (e.g., 'Pick up the red cup' OR 'Place it in BB'): ").strip()
-    #         if not user_text:
-    #             return
-
-    #         # 1) Query the LLM to interpret
-    #         response = self.query_llm(user_text)
-    #         self.get_logger().info(f"LLM response: {response}")
-
-    #         # 2) From the LLM text, figure out if user wants pick and/or place
-    #         do_pick = ("pick" in response.lower())
-    #         do_place = ("place" in response.lower())
-
-    #         # Extract color (which cup) from text (if any)
-    #         color = self.extract_color(response)
-    #         # Extract location (which place key) from text (if any)
-    #         location = self.extract_location(response)
-
-    #         # # Some defaults
-    #         # if do_pick and not color:
-    #         #     color = "RedCup"  # fallback color
-    #         # if do_place and not location:
-    #         #     location = "BB"   # fallback place
-
-    #         if do_pick and do_place:
-    #             # Example: "Pick up the green cup and place it on AA"
-    #             self.do_pick_and_place(color, location)
-
-    #         elif do_pick and not do_place:
-    #             # Example: "Pick up the red cup" => pick only
-    #             self.do_pick_only(color)
-
-    #         elif do_place and not do_pick:
-    #             # Example: "Place the item in CC"
-    #             # Use the currently_held_item if user hasn't specified a color
-    #             if not color:
-    #                 color = self.currently_held_item
-
-    #             self.do_place_only(color, location)
-    #         else:
-    #             # The user said something the LLM didn't interpret as pick or place
-    #             self.get_logger().warn("No recognized pick/place action from LLM response.")
-
-    #     except Exception as e:
-    #         self.get_logger().error(f"Error in command: {e}")
-    #     finally:
-    #         self.busy = False
 
     def poll_user(self):
         if self.busy:
@@ -1125,8 +1189,11 @@ class LLMAndNavNode(Node):
             color = self.extract_color(response)
             location = self.extract_location(response)
 
-            if do_pick and do_place:
+            if "step" in response.lower():
+                self.handle_multi_step(response)
+            elif do_pick and do_place:
                 self.do_pick_and_place(color, location)
+
             elif do_pick and not do_place:
                 self.do_pick_only(color)
             elif do_place and not do_pick:
@@ -1140,6 +1207,63 @@ class LLMAndNavNode(Node):
             self.get_logger().error(f"Error in command: {e}")
         finally:
             self.busy = False
+        
+    def handle_multi_step(self, response: str):
+        step_pattern = r"Step\s*\d+:\s*(.*)"
+        step_lines = re.findall(step_pattern, response, re.IGNORECASE)
+
+        if not step_lines:
+            self.get_logger().warn("No valid steps found in response.")
+            return
+
+        for i, line in enumerate(step_lines, 1):
+            lower = line.lower()
+            cup = self.extract_color(line)
+            slot = self.extract_location(line)
+
+            self.get_logger().info(f"Step {i}: parsed line -> '{line.strip()}'")
+
+            # Pick + Place
+            if "pick" in lower and "place" in lower and cup and slot:
+                self.get_logger().info(f"Step {i}: Pick {cup}, Place in {slot}")
+                ok_pick = self.pick_place_mgr.pick(cup)
+                if not ok_pick:
+                    self.get_logger().error(f"Step {i}: Failed to pick {cup}")
+                    break
+                self.currently_held_item = cup
+
+                ok_place = self.pick_place_mgr.place(cup, slot)
+                if not ok_place:
+                    self.get_logger().error(f"Step {i}: Failed to place {cup} in {slot}")
+                    break
+                self.currently_held_item = None
+
+            # Pick only
+            elif "pick" in lower and cup:
+                self.get_logger().info(f"Step {i}: Pick {cup}")
+                ok = self.pick_place_mgr.pick(cup)
+                if ok:
+                    self.currently_held_item = cup
+                else:
+                    self.get_logger().error(f"Step {i}: Failed to pick {cup}")
+                    break
+
+            # Place only
+            elif "place" in lower and slot:
+                if not self.currently_held_item:
+                    self.get_logger().warn(f"Step {i}: No item currently held to place.")
+                    break
+                self.get_logger().info(f"Step {i}: Place {self.currently_held_item} in {slot}")
+                ok = self.pick_place_mgr.place(self.currently_held_item, slot)
+                if ok:
+                    self.currently_held_item = None
+                else:
+                    self.get_logger().error(f"Step {i}: Failed to place item in {slot}")
+                    break
+
+            else:
+                self.get_logger().warn(f"Step {i}: Could not interpret action for line: {line}")
+
             
     # --------------------------------------------------------------------------
     # Concrete methods to do pick or place
@@ -1176,38 +1300,6 @@ class LLMAndNavNode(Node):
     # --------------------------------------------------------------------------
     # LLM handling
     # --------------------------------------------------------------------------
-    
-    # def query_llm(self, user_text):
-    #     """
-    #     Send user_text to GPT-3.5 or GPT-4 to interpret. 
-    #     In a real system, you'd craft the system prompt carefully to ensure
-    #     the LLM response is short, e.g. "User wants to: pick or place. Cup color? Place location?"
-    #     """
-    #     try:
-    #         resp = openai.chat.completions.create(
-    #             model="gpt-3.5-turbo",
-    #             messages=[
-    #                 {
-    #                     "role": "system",
-    #                     "content": (
-    #                         "You control a robot that can pick up and place colored cups. "
-    #                         "Available cups: RedCup, GreenCup, BlueCup, YellowCup, PurpleCup. "
-    #                         "Available places: A, B, C, AA, BB, CC, etc. "
-    #                         "The user might say things like 'pick up the red cup' or 'place it in AA', or both. "
-    #                         "Your job is to interpret their intent and respond with a short structured sentence including the keywords: 'pick', 'place', the color (e.g. 'red'), and the location (e.g. 'AA'). "
-    #                         "Fix minor spelling mistakes in cup colors and locations. "
-    #                         "If you are uncertain about the color or location, or the user's message is ambiguous, ask for clarification with a short question like: 'Did you mean the blue cup?' or 'Where should I place the cup?'. "
-    #                         "Only ask one clarifying question at a time if needed."
-    #                     )
-    #                 },
-    #                 {"role": "user", "content": user_text},
-    #             ],
-    #             temperature=0.0
-    #         )
-    #         return resp.choices[0].message.content
-    #     except Exception as e:
-    #         self.get_logger().error(f"LLM error: {str(e)}")
-    #         return user_text  # fallback: just use user text
         
     def query_llm(self):
         try:
@@ -1217,13 +1309,15 @@ class LLMAndNavNode(Node):
                     {"role": "system", "content": (
                         "You control a robot that can pick up and place colored cups. "
                         "Available cups: RedCup, GreenCup, BlueCup, YellowCup, PurpleCup. "
-                        "Available places: A, B, C, AA, BB, CC, etc. "
-                        "The user might say things like 'pick up the red cup' or 'place it in AA', or both. "
-                        "Your job is to interpret their intent and respond with a short structured sentence including the keywords: 'pick', 'place', the color (e.g. 'red'), and the location (e.g. 'AA'). "
-                        "Fix minor spelling mistakes in cup colors and locations. "
-                        "If you are uncertain about the color or location, or the user's message is ambiguous, ask for clarification with a short question like: 'Did you mean the blue cup?' or 'Where should I place the cup?'. "
-                        "Only ask one clarifying question at a time if needed."
+                        "Available places: A, B, C, AA, BB, CC. "
+                        "Users may provide one or more instructions in a single sentence, like: "
+                        "'Pick up the red cup and place it in AA, then pick up the green cup and put it in BB.' "
+                        "Respond with a step-by-step list using this exact format:\n\n"
+                        "Step 1: pick RedCup and place in AA\n"
+                        "Step 2: pick GreenCup and place in BB\n\n"
+                        "If something is unclear, ask for clarification. Respond only with steps or a clarification question."
                     )},
+
                     *self.chat_history
                 ],
                 temperature=0.0
@@ -1270,3 +1364,4 @@ def main(args=None):
 
 if __name__ == "__main__":
     main()
+
