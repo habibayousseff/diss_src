@@ -226,7 +226,7 @@
       <include>
         <uri>file:///home/habibahassan/.gazebo/models/red_plastic_cup</uri>
       </include>
-      <pose>0.88749998807907104 1.2151999473571777 1.08 0 0 0</pose>
+      <pose>0.88749998807907104 1.2151999473571777 1.085 0 0 0</pose>
       <static>false</static>
       <self_collide>false</self_collide>
     </model>
@@ -250,7 +250,7 @@
       <include>
         <uri>file:///home/habibahassan/.gazebo/models/yellow_plastic_cup</uri>
       </include>
-      <pose>0.95346999168395996 1.4409999847412109 1.08 0 0 0</pose>
+      <pose>0.95346999168395996 1.4409999847412109 1.085 0 0 0</pose>
       <static>false</static>
       <self_collide>false</self_collide>
     </model>
@@ -258,7 +258,7 @@
       <include>
         <uri>file:///home/habibahassan/.gazebo/models/purple_plastic_cup</uri>
       </include>
-      <pose>1.3496899604797363 1.406999945640564 1.08 0 0 0</pose>
+      <pose>1.3496899604797363 1.406999945640564 1.085 0 0 0</pose>
       <static>false</static>
       <self_collide>false</self_collide>
     </model>
