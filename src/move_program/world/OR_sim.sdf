@@ -90,20 +90,20 @@
       <static>false</static>
       <self_collide>false</self_collide>
     </model>
-    <model name='Tray1'>
+    <!-- <model name='Tray1'>
       <include>
         <uri>file:///home/habibahassan/.gazebo/models/tray</uri>
       </include>
       <pose>1.1489399671554565 1.3731900453567505 1.0151047706604004 0 0 1.57</pose>
-      <static>false</static>
+      <static>true</static>
       <self_collide>false</self_collide>
-    </model>
+    </model> -->
     <model name='Tray2'>
       <include>
         <uri>file:///home/habibahassan/.gazebo/models/traySlots</uri>
       </include>
       <pose>1.1056499481201174 0.082587398588657379 1.0144892930984497 0 0 1.57</pose>
-      <static>false</static>
+      <static>true</static>
       <self_collide>false</self_collide>
     </model>
 
@@ -226,16 +226,16 @@
       <include>
         <uri>file:///home/habibahassan/.gazebo/models/red_plastic_cup</uri>
       </include>
-      <pose>0.88749998807907104 1.2151999473571777 1.085 0 0 0</pose>
-      <static>false</static>
+      <pose>0.88749998807907104 1.2151999473571777 1.08 0 0 0</pose>
+      <static>true</static>
       <self_collide>false</self_collide>
     </model>
     <model name='GreenCup'>
       <include>
         <uri>file:///home/habibahassan/.gazebo/models/green_plastic_cup</uri>
       </include>
-      <pose>1.1489400000000001 1.2950219999999999 1.0889530000000001 0 0 0</pose>
-      <static>false</static>
+      <pose>1.1489400000000001 1.2950219999999999 1.08 0 0 0</pose>
+      <static>true</static>
       <self_collide>false</self_collide>
     </model>
     <model name='BlueCup'>
@@ -243,23 +243,23 @@
         <uri>file:///home/habibahassan/.gazebo/models/blue_plastic_cup</uri>
       </include>
       <pose>1.4265000000000001 1.2173 1.0728 0 0 0</pose>
-      <static>false</static>
+      <static>true</static>
       <self_collide>false</self_collide>
     </model>
     <model name='YellowCup'>
       <include>
         <uri>file:///home/habibahassan/.gazebo/models/yellow_plastic_cup</uri>
       </include>
-      <pose>0.95346999168395996 1.4409999847412109 1.085 0 0 0</pose>
-      <static>false</static>
+      <pose>0.95346999168395996 1.4409999847412109 1.08 0 0 0</pose>
+      <static>true</static>
       <self_collide>false</self_collide>
     </model>
     <model name='PurpleCup'>
       <include>
         <uri>file:///home/habibahassan/.gazebo/models/purple_plastic_cup</uri>
       </include>
-      <pose>1.3496899604797363 1.406999945640564 1.085 0 0 0</pose>
-      <static>false</static>
+      <pose>1.3496899604797363 1.406999945640564 1.08 0 0 0</pose>
+      <static>true</static>
       <self_collide>false</self_collide>
     </model>
     <model name='CylinderTable'>

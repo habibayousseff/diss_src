@@ -26,28 +26,28 @@ import openai
 ###############################################################################
 OBJECT_GOALS = {
     "RedCup": {
-        "position": [0.9226, 1.2018, 1.368],
+        "position": [0.89, 1.2018, 1.33],
         "orientation": [0.739, 0.673, 0.014, -0.023],
     },
     "GreenCup": {
-        "position": [1.184, 1.281, 1.384],
+        "position": [1.184, 1.281, 1.33],
         "orientation": [0.739, 0.673, 0.014, -0.023],
     },
     "BlueCup": {
-        "position": [1.46, 1.203, 1.368],
+        "position": [1.46, 1.203, 1.33],
         "orientation": [0.739, 0.673, 0.014, -0.023],
     },
     "YellowCup": {
-        "position": [0.99, 1.427, 1.368],
+        "position": [0.99, 1.427, 1.33],
         "orientation": [0.739, 0.673, 0.014, -0.023],
     },
     "PurpleCup": {
-        "position": [1.385, 1.393, 1.368],
+        "position": [1.385, 1.393, 1.33],
         "orientation": [0.739, 0.673, 0.014, -0.023],
     },
 }
 
-PLACE_GOAL = {
+EXTRA_LOCATIONS = {
     "TrialPlaceGoal": {
         "position": [1.154, 0.249, 1.293],
         "orientation": [-0.041, 0.999, -0.002, -0.006]
@@ -59,7 +59,9 @@ PLACE_GOAL = {
     "HOME": {
         "position": [1.061, 0.542, 2.101],
         "orientation": [0.000, -0.707, 0.707, 0.000]
-    },
+    }
+}
+PLACE_GOAL = {
     "A": {
         "position": [1.42, -0.037, 1.35],
         "orientation": [-0.041, 0.999, -0.002, -0.006]
@@ -91,7 +93,7 @@ PLACE_GOAL = {
 ###############################################################################
 GRIPPER_OPEN = 0.004
 GRIPPER_MIDDLE = 0.06
-GRIPPER_CLOSE = 0.08
+GRIPPER_CLOSE = 0.083
 
 def moveit_error_string(code):
     error_map = {
@@ -179,12 +181,6 @@ class PickAndPlaceManager(Node):
         approach_place = place_pos.copy()
         approach_place[2] += 0.097
         
-        # 1) Move up to the "safe" pose (TestConfig)
-        # if not self.move_ee_to_pose(PLACE_GOAL["TestConfig"]["position"],
-        #                             PLACE_GOAL["TestConfig"]["orientation"]):
-        #     return False
-        # time.sleep(2)
-        
         # 2) go to above the place position
         if not self.move_ee_to_pose(approach_place, place_orient):
             return False
@@ -204,11 +200,11 @@ class PickAndPlaceManager(Node):
             return False
         time.sleep(2)
 
-        # 5) Move up to the "HOME" pose
-        if not self.move_ee_to_pose(PLACE_GOAL["HOME"]["position"],
-                                    PLACE_GOAL["HOME"]["orientation"]):
-            return False
-        time.sleep(2)
+        # # 5) Move up to the "HOME" pose
+        # if not self.move_ee_to_pose(EXTRA_LOCATIONS["HOME"]["position"],
+        #                             EXTRA_LOCATIONS["HOME"]["orientation"]):
+        #     return False
+        # time.sleep(2)
 
         self.get_logger().info(f"Successfully placed '{cup_name}' at '{place_key}'")
         return True
@@ -392,7 +388,7 @@ class LLMAndNavNode(Node):
 
         # For calling OpenAI
         openai.api_key = os.getenv("OPENAI_API_KEY")
-        self.get_logger().info("LLM node started")
+        # self.get_logger().info("LLM node started")
 
         self.currently_held_item = None
         self.pick_place_mgr = PickAndPlaceManager()
@@ -403,7 +399,7 @@ class LLMAndNavNode(Node):
 
         self.busy = False
         self.poll_timer = self.create_timer(5.0, self.poll_user)
-        self.get_logger().info("Ready for user commands...")
+        # self.get_logger().info("Ready for user commands...")
         
         self.slot_coordinates = {
             slot: (data["position"][0], data["position"][1])  # X, Y only
@@ -411,7 +407,7 @@ class LLMAndNavNode(Node):
         }
         
         self.slot_info = "\n".join([
-            f"{slot}: x={coord[0]:.3f}, y={coord[1]:.3f}"
+            f"{slot}: X={coord[0]:.3f}, Y={coord[1]:.3f}"
             for slot, coord in self.slot_coordinates.items()
         ])
 
@@ -479,7 +475,7 @@ class LLMAndNavNode(Node):
 
             # Pick + Place
             if "pick" in lower and "place" in lower and cup and slot:
-                self.get_logger().info(f"Step {i}: Pick {cup}, Place in {slot}")
+                self.get_logger().info(f"Step {i}: Pick {cup}, Place in {slot} \n")
                 ok_pick = self.pick_place_mgr.pick(cup)
                 if not ok_pick:
                     self.get_logger().error(f"Step {i}: Failed to pick {cup}")
@@ -488,13 +484,13 @@ class LLMAndNavNode(Node):
 
                 ok_place = self.pick_place_mgr.place(cup, slot)
                 if not ok_place:
-                    self.get_logger().error(f"Step {i}: Failed to place {cup} in {slot}")
+                    self.get_logger().error(f"Step {i}: Failed to place {cup} in {slot} \n")
                     break
                 self.currently_held_item = None
 
             # Pick only
             elif "pick" in lower and cup:
-                self.get_logger().info(f"Step {i}: Pick {cup}")
+                self.get_logger().info(f"Step {i}: Pick {cup} \n")
                 ok = self.pick_place_mgr.pick(cup)
                 if ok:
                     self.currently_held_item = cup
@@ -505,9 +501,9 @@ class LLMAndNavNode(Node):
             # Place only
             elif "place" in lower and slot:
                 if not self.currently_held_item:
-                    self.get_logger().warn(f"Step {i}: No item currently held to place.")
+                    self.get_logger().warn(f"Step {i}: No item currently held to place. \n")
                     break
-                self.get_logger().info(f"Step {i}: Place {self.currently_held_item} in {slot}")
+                self.get_logger().info(f"Step {i}: Place {self.currently_held_item} in {slot} \n")
                 ok = self.pick_place_mgr.place(self.currently_held_item, slot)
                 if ok:
                     self.currently_held_item = None
@@ -553,58 +549,43 @@ class LLMAndNavNode(Node):
 
     # --------------------------------------------------------------------------
     # LLM handling
-    # --------------------------------------------------------------------------
-        
-    # def query_llm(self):
-    #     try:
-    #         resp = openai.chat.completions.create(
-    #             model="gpt-3.5-turbo",
-    #             messages=[
-    #                 {"role": "system", "content": (
-    #                     "You control a robot that can pick up and place colored cups. "
-    #                     "Available cups: RedCup, GreenCup, BlueCup, YellowCup, PurpleCup. "
-    #                     "Available places: A, B, C, AA, BB, CC. "
-    #                     "Users may provide one or more instructions in a single sentence, like: "
-    #                     "'Pick up the red cup and place it in AA, then pick up the green cup and put it in BB.' "
-    #                     "Respond with a step-by-step list using this exact format:\n\n"
-    #                     "Step 1: pick RedCup and place in AA\n"
-    #                     "Step 2: pick GreenCup and place in BB\n\n"
-    #                     "If something is unclear, ask for clarification. Respond only with steps or a clarification question."
-    #                 )},
-
-    #                 *self.chat_history
-    #             ],
-    #             temperature=0.0
-    #         )
-    #         return resp.choices[0].message.content
-    #     except Exception as e:
-    #         self.get_logger().error(f"LLM error: {str(e)}")
-    #         return "I'm sorry, something went wrong."
-        
+    # --------------------------------------------------------------------------   
     def query_llm(self):
         try:
             slot_info = self.slot_info
-
+            
+            # works for multistep
             system_prompt = (
-                "You control a robot that picks and places colored cups.\n"
+                # initalising
+                "You control a robot that can pick up and place colored cups.\n"
+                "robot can do three seperate tasks: pick only, place only, pick and place\n"
                 "Available cups: RedCup, GreenCup, BlueCup, YellowCup, PurpleCup.\n"
-                "Available places and their XY coordinates:\n"
+                "Available places: A, B, C, AA, BB, CC.\n"
+                "This is the XY coordinates of the places:\n"
                 f"{slot_info}\n\n"
+                # MutliStep Instuctions
+                "Users may provide one or more instructions in a single sentence, like: "
+                "'Pick up the red cup and place it in AA, then pick up the green cup and put it in BB.' "
+                "Respond with a step-by-step list using this exact format:\n\n"
+                "Step 1: pick RedCup and place in AA\n"
+                "Step 2: pick GreenCup and place in BB\n\n"
+                "If the robot is already holding a cup, and the user says place it, you must NOT add a pick step."
+                # Spatial Locations
                 "You can reason about relative spatial relationships using coordinates:\n"
-                "- Right = increasing Y\n"
-                "- Left = decreasing Y\n"
-                "- Above = increasing X\n"
-                "- Below = decreasing X\n\n"
+                "- Below = if Y coordinate of place is greater Y coordinate of user given place, then it is below\n"
+                "- Above = if Y coordinate of place is smaller Y coordinate of user given place, then it is above\n"
+                "- Left = if X coordinate of place is greater X coordinate of user given place, then it is left\n"
+                "- Right = if X coordinate of place is smaller X coordinate of user given place, then it is right\n"
+                "Examples:\n"
+                "- If A is at (1.42, -0.04) and AA is at (1.42, 0.21), then AA is BELOW A\n"
+                "- If BB is at (1.13, 0.21) and CC is at (0.83, 0.21), then CC is to the RIGHT of BB\n"
+                "- If BB is at (1.13, 0.21) and B is at (1.13, -0.04), then B is ABOVE BB\n"
+                "- If CC is at (0.83, 0.21) and BB is at (1.13, 0.21), then BB is to the LEFT of CC\n"
                 "IMPORTANT: If the user gives a spatial reference like 'to the right of BB', "
                 "you MUST replace that with the exact slot name based on coordinate logic.\n"
                 "NEVER say 'to the right of BB' in your final output. Always resolve it.\n\n"
-                "Examples:\n"
-                "- If AA is to the right of BB, and user says 'to the right of BB', output should be:\n"
-                "  Step 1: place RedCup in AA\n"
-                "- If A is below B, and user says 'put it below B', output should be:\n"
-                "  Step 1: place BlueCup in A\n\n"
-                "Format your response as:\n"
-                "Step 1: pick RedCup and place in AA"
+                
+                "If something is unclear, ask for clarification. Respond only with steps or a clarification question."
             )
 
             resp = openai.chat.completions.create(
@@ -626,7 +607,7 @@ class LLMAndNavNode(Node):
         """Look for known color words in the LLM response."""
         lower = text.lower()
         for c in ["red", "green", "blue", "yellow", "purple"]:
-            if c in lower:
+            if c in lower: 
                 # Return e.g. 'RedCup'
                 return c.capitalize() + "Cup"
         return None
@@ -659,4 +640,3 @@ def main(args=None):
 
 if __name__ == "__main__":
     main()
-
