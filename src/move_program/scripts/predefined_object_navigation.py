@@ -15,26 +15,27 @@ from moveit_msgs.msg import (
 from moveit_msgs.action import MoveGroup, ExecuteTrajectory
 
 # dictionary of known object poses:
+
 OBJECT_GOALS = {
     "RedCup": {
-        "position": [1.01, 1.295022, 1.27],
-        "orientation": [0.720, 0.694, -0.029, -0.013]
+        "position": [0.913, 1.234, 1.35],
+        "orientation": [0.730, 0.682, 0.028, -0.025],
     },
     "GreenCup": {
-        "position": [1.166, 1.260, 1.408],
-        "orientation": [0.752, 0.658, 0.038, -0.018]
+        "position": [1.195, 1.287, 1.35],
+        "orientation": [0.730, 0.683, 0.028, -0.025],
     },
     "BlueCup": {
-        "position": [1.29, 1.27, 1.27],
-        "orientation": [0.714, 0.699, -0.032, -0.041]
+        "position": [1.463, 1.215, 1.35],
+        "orientation": [0.728, 0.685, 0.025, -0.023],
     },
     "YellowCup": {
-        "position": [0.963062, 1.461358, 1.27],
-        "orientation": [0.714, 0.699, -0.032, -0.041]
+        "position": [0.985, 1.444, 1.35],
+        "orientation": [0.739, 0.673, 0.014, -0.023],
     },
     "PurpleCup": {
-        "position": [1.168, 1.466, 1.27],
-        "orientation": [0.714, 0.699, -0.032, -0.041]
+        "position": [1.384, 1.398, 1.35],
+        "orientation": [0.730, 0.683, 0.028, -0.025],
     },
     "TrialPlaceGoal": {
         "position": [1.154, 0.249, 1.293],
@@ -44,33 +45,33 @@ OBJECT_GOALS = {
         "position": [1.154, 0.288, 1.604],
         "orientation": [-0.040, 0.996, 0.076, -0.009]
     },
-    "Up": {
+    "HOME": {
         "position": [1.061, 0.542, 2.101],
         "orientation": [0.000, -0.707, 0.707, 0.000]
     },
     "A": {
-        "position": [1.42, -0.037, 1.35],
-        "orientation": [-0.041, 0.999, -0.002, -0.006]
+        "position": [1.457, -0.020, 1.35],
+        "orientation": [0.728, 0.685, 0.023, -0.019]
     },
     "B": {
-        "position": [1.131, -0.037, 1.35],
-        "orientation": [-0.041, 0.999, -0.002, -0.006]
+        "position": [1.143, -0.020, 1.35],
+        "orientation": [0.728, 0.684, 0.023, -0.020]
     },
     "C": {
-        "position": [0.83, -0.037, 1.35],
-        "orientation": [-0.041, 0.999, -0.002, -0.006]
+        "position": [0.777, -0.020, 1.35],
+        "orientation": [0.728, 0.684, 0.034, -0.008]
     },
     "AA": {
-        "position": [1.42, 0.215, 1.35],
-        "orientation": [-0.041, 0.999, -0.002, -0.006]
+        "position": [1.457, 0.185, 1.35],
+        "orientation": [0.728, 0.685, 0.022, -0.020]
     },
     "BB": {
-        "position": [1.131, 0.215, 1.35],
-        "orientation": [-0.041, 0.999, -0.002, -0.006]
+        "position": [1.143, 0.185, 1.35],
+        "orientation": [0.728, 0.685, 0.023, -0.020]
     },
     "CC": {
-        "position": [0.83, 0.215, 1.35],
-        "orientation": [-0.041, 0.999, -0.002, -0.006]
+        "position": [0.777, 0.185, 1.35],
+        "orientation": [0.728, 0.684, 0.034, -0.008]
     },
 }
 

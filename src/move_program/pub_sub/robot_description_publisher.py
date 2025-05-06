@@ -20,7 +20,6 @@ class RobotDescriptionPublisher(Node):
             msg = String()
             msg.data = robot_description
             self.publisher_.publish(msg)
-            self.get_logger().info('Published robot_description.')
         else:
             self.get_logger().warn('robot_description parameter is empty.')
 

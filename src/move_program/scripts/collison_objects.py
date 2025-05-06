@@ -30,9 +30,9 @@ class SceneObjectsNode(Node):
         self.add_table("table1", 1.09717619, 1.39642)
         self.add_table("table2", 1.08436, 0.0708296)
 
-        # 4) Trays
-        self.add_tray1()  # using the multiple collisions from tray_model
-        self.add_tray2()
+        # # 4) Trays
+        # self.add_tray1()  # using the multiple collisions from tray_model
+        # self.add_tray2()
 
         # 5) Cups
         # self.add_cup("red_cup", 0.973062, 1.295022) 

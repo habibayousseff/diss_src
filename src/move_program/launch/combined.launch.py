@@ -1,13 +1,3 @@
-"""
-Combined Launch File:
-This file merges the logic of both your simulation launch (or_sim.launch.py)
-and your MoveIt2 launch (ur_moveit.launch.py) into one unified file.
-It sets up the robot in Gazebo, configures MoveIt2 (with its controllers,
-move_group, and RViz), and launches all necessary simulation and planning nodes.
-All nodes share the same parameter context so that parameters (e.g. robot_description)
-are passed consistently.
-"""
-
 import os
 import yaml
 import time
@@ -134,17 +124,6 @@ def launch_setup(context, *args, **kwargs):
         arguments=["joint_state_broadcaster", "--controller-manager", "/controller_manager"],
     )
     
-    # ros2_controllers_path = os.path.join(
-    #     get_package_share_directory("ur_robot_driver"), "config", "ur_controllers.yaml"
-    # )
-    
-    # ros2_control_node = Node(
-    #     package="controller_manager",
-    #     executable="ros2_control_node",
-    #     parameters=[ros2_controllers_path],
-    #     output="both",
-    # )
-    
     spawn_controllers = []
     for ctrl in ["joint_state_broadcaster", "scaled_joint_trajectory_controller"]:
         spawn_controllers.append(
@@ -154,13 +133,6 @@ def launch_setup(context, *args, **kwargs):
                 output="screen",
             )
         )
-    
-    # delay_ros2_control = RegisterEventHandler(
-    #     OnProcessExit(
-    #         target_action=robot_state_publisher_node,
-    #         on_exit=[ros2_control_node],
-    #     )
-    # )
     
     initial_joint_controller_spawner_started = Node(
         package="controller_manager",
@@ -176,13 +148,6 @@ def launch_setup(context, *args, **kwargs):
         output="screen",
     )
     
-    # delay_gripper_spawner = RegisterEventHandler(
-    #     event_handler=OnProcessExit(
-    #         target_action=ros2_control_node,  # Wait for the control node
-    #         on_exit=[gripper_controller_spawner]
-    #     )
-    # )
-
     wait_robot_description = Node(
         package="ur_robot_driver",
         executable="wait_for_robot_description",
@@ -192,7 +157,7 @@ def launch_setup(context, *args, **kwargs):
     robot_description_publisher_node = Node(
         package="move_program",
         executable="robot_description_publisher.py",
-        parameters=[{"use_sim_time": True}, expanded_urdf],
+        parameters=[{"use_sim_time": True, "robot_description": expanded_urdf}],
         output="screen"
     )
     
@@ -200,7 +165,7 @@ def launch_setup(context, *args, **kwargs):
         MoveItConfigsBuilder(robot_name="ur", package_name="ur_moveit_config")
         .robot_description_semantic(Path("srdf") / "ur.srdf.xacro", {"name": ur_type})
         .trajectory_execution(file_path="config/moveit_controllers.yaml")
-        .planning_pipelines(pipelines=["ompl"])
+        .planning_pipelines(pipelines=["stomp"])
         .planning_scene_monitor(
             publish_robot_description=True,
             publish_robot_description_semantic=True
@@ -340,12 +305,12 @@ def generate_launch_description():
 
     ld.add_action(OpaqueFunction(function=launch_setup))
 
-    collison_objects_node = Node(
+    collision_objects_node = Node(
         package="move_program",
         executable="collison_objects.py",
         output="screen",
     )
-    ld.add_action(collison_objects_node)
+    ld.add_action(collision_objects_node)
 
     llm_node = Node(
         package="move_program",
@@ -353,16 +318,7 @@ def generate_launch_description():
         output="screen",
     )
     ld.add_action(llm_node)
-
-    link_attacher_node = Node(
-        package="move_program",
-        executable="llm_node.py",
-        output="screen",
-    )
-    ld.add_action(link_attacher_node)
-
     return ld
 
 if __name__ == '__main__':
-    time.sleep(20)
     generate_launch_description()

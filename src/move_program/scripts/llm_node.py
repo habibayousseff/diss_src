@@ -17,33 +17,35 @@ from moveit_msgs.msg import (
     Constraints,
     PositionConstraint,
     OrientationConstraint,
-    PlanningOptions
+    PlanningOptions,
+    PlanningScene,
+    AttachedCollisionObject ,
+    CollisionObject
 )
-import openai
+# import openai
+from openai import OpenAI
 
-###############################################################################
-#                            SHARED DICTIONARIES
-###############################################################################
+# coordinates of target objects and goal positions
 OBJECT_GOALS = {
     "RedCup": {
-        "position": [0.89, 1.2018, 1.33],
-        "orientation": [0.739, 0.673, 0.014, -0.023],
+        "position": [0.913, 1.234, 1.35],
+        "orientation": [0.730, 0.682, 0.028, -0.025],
     },
     "GreenCup": {
-        "position": [1.184, 1.281, 1.33],
-        "orientation": [0.739, 0.673, 0.014, -0.023],
+        "position": [1.195, 1.287, 1.35],
+        "orientation": [0.730, 0.683, 0.028, -0.025],
     },
     "BlueCup": {
-        "position": [1.46, 1.203, 1.33],
-        "orientation": [0.739, 0.673, 0.014, -0.023],
+        "position": [1.463, 1.215, 1.35],
+        "orientation": [0.728, 0.685, 0.025, -0.023],
     },
     "YellowCup": {
-        "position": [0.99, 1.427, 1.33],
+        "position": [0.985, 1.444, 1.35],
         "orientation": [0.739, 0.673, 0.014, -0.023],
     },
     "PurpleCup": {
-        "position": [1.385, 1.393, 1.33],
-        "orientation": [0.739, 0.673, 0.014, -0.023],
+        "position": [1.384, 1.398, 1.35],
+        "orientation": [0.730, 0.683, 0.028, -0.025],
     },
 }
 
@@ -63,36 +65,33 @@ EXTRA_LOCATIONS = {
 }
 PLACE_GOAL = {
     "A": {
-        "position": [1.42, -0.037, 1.35],
-        "orientation": [-0.041, 0.999, -0.002, -0.006]
+        "position": [1.457, -0.020, 1.35],
+        "orientation": [0.728, 0.685, 0.023, -0.019]
     },
     "B": {
-        "position": [1.131, -0.037, 1.35],
-        "orientation": [-0.041, 0.999, -0.002, -0.006]
+        "position": [1.143, -0.020, 1.35],
+        "orientation": [0.728, 0.684, 0.023, -0.020]
     },
     "C": {
-        "position": [0.83, -0.037, 1.35],
-        "orientation": [-0.041, 0.999, -0.002, -0.006]
+        "position": [0.777, -0.020, 1.35],
+        "orientation": [0.728, 0.684, 0.034, -0.008]
     },
     "AA": {
-        "position": [1.42, 0.215, 1.35],
-        "orientation": [-0.041, 0.999, -0.002, -0.006]
+        "position": [1.457, 0.185, 1.35],
+        "orientation": [0.728, 0.685, 0.022, -0.020]
     },
     "BB": {
-        "position": [1.131, 0.215, 1.35],
-        "orientation": [-0.041, 0.999, -0.002, -0.006]
+        "position": [1.143, 0.185, 1.35],
+        "orientation": [0.728, 0.685, 0.023, -0.020]
     },
     "CC": {
-        "position": [0.83, 0.215, 1.35],
-        "orientation": [-0.041, 0.999, -0.002, -0.006]
+        "position": [0.777, 0.185, 1.35],
+        "orientation": [0.728, 0.684, 0.034, -0.008]
     },
 }
 
-###############################################################################
-#                          GRIPPER CONSTANTS
-###############################################################################
 GRIPPER_OPEN = 0.004
-GRIPPER_MIDDLE = 0.06
+GRIPPER_MIDDLE = 0.04
 GRIPPER_CLOSE = 0.083
 
 def moveit_error_string(code):
@@ -111,12 +110,11 @@ def moveit_error_string(code):
     return error_map.get(code, "UNKNOWN")
 
 
-###############################################################################
-#            A CLASS TO PERFORM PICK AND PLACE STEPS (BUT SEPARATELY)
-###############################################################################
+# pick and place, motion control class
 class PickAndPlaceManager(Node):
     def __init__(self):
         super().__init__('pick_and_place_manager')
+        self.scene_pub = self.create_publisher(PlanningScene, '/planning_scene', 10)  # ✅ ADD THIS
         # Action clients
         self._move_client = ActionClient(self, MoveGroup, '/move_action')
         self._exec_client = ActionClient(self, ExecuteTrajectory, '/execute_trajectory')
@@ -126,9 +124,67 @@ class PickAndPlaceManager(Node):
         self._move_client.wait_for_server()
         self._exec_client.wait_for_server()
         self._gripper_client.wait_for_server()
+    
+    # TF broadcasting fucntions
+    def attach_object(self, object_id="my_cylinder", link_name="finger_left"):
+        aco = AttachedCollisionObject()
+        aco.link_name = link_name
+        aco.object.id = object_id
+        aco.object.header.frame_id = link_name
+        aco.object.operation = CollisionObject.ADD
 
+        prim = SolidPrimitive()
+        prim.type = SolidPrimitive.CYLINDER
+        prim.dimensions = [0.05, 0.035]
+        aco.object.primitives.append(prim)
+
+        link_pose = Pose()
+        link_pose.position.z = 0.14
+        link_pose.position.y = 0.05
+        link_pose.orientation.w = 1.0
+        aco.object.primitive_poses.append(link_pose)
+
+        scene_msg = PlanningScene()
+        scene_msg.is_diff = True
+        scene_msg.robot_state.attached_collision_objects.append(aco)
+        scene_msg.robot_state.is_diff = True
+
+        self.get_logger().info(f"Attaching object '{object_id}'")
+        self.scene_pub.publish(scene_msg)
+        time.sleep(1.0)
+
+    def detach_object(self, object_id="my_cylinder", link_name="finger_left"):
+        aco = AttachedCollisionObject()
+        aco.link_name = link_name
+        aco.object.id = object_id
+        aco.object.header.frame_id = link_name
+        aco.object.operation = CollisionObject.REMOVE
+
+        scene_msg = PlanningScene()
+        scene_msg.is_diff = True
+        scene_msg.robot_state.attached_collision_objects.append(aco)
+        scene_msg.robot_state.is_diff = True
+
+        self.get_logger().info(f"Detaching object '{object_id}'")
+        self.scene_pub.publish(scene_msg)
+        time.sleep(1.0)
+        
+    def remove_object(self, object_id="my_cylinder"):
+        co = CollisionObject()
+        co.id = object_id
+        co.header.frame_id = "world"
+        co.operation = CollisionObject.REMOVE
+
+        scene_msg = PlanningScene()
+        scene_msg.is_diff = True
+        scene_msg.world.collision_objects.append(co)
+
+        self.get_logger().info(f"Removing object '{object_id}' from scene")
+        self.scene_pub.publish(scene_msg)
+        time.sleep(1.0)
+    
+    # Robotic arm contorl fucntions
     def pick(self, cup_name):
-        """Pick only: approach object, open, descend, close, lift."""
         if cup_name not in OBJECT_GOALS:
             self.get_logger().error(f"Object '{cup_name}' not in OBJECT_GOALS.")
             return False
@@ -143,7 +199,7 @@ class PickAndPlaceManager(Node):
 
         # 2) Approach above pick
         approach_pick = pick_pos.copy()
-        approach_pick[2] += 0.097
+        approach_pick[2] += 0.15
         if not self.move_ee_to_pose(approach_pick, pick_orient):
             return False
         time.sleep(2)
@@ -161,12 +217,13 @@ class PickAndPlaceManager(Node):
         if not self.move_ee_to_pose(approach_pick, pick_orient):
             return False
         time.sleep(2)
+        
+        self.attach_object(object_id=cup_name)
 
         self.get_logger().info(f"Successfully picked up '{cup_name}'")
         return True
 
     def place(self, cup_name, place_key):
-        """Place only: from current position => intermediate => final => open => lift => up."""
         if cup_name not in OBJECT_GOALS:
             self.get_logger().error(f"Object '{cup_name}' not in OBJECT_GOALS.")
             return False
@@ -179,7 +236,7 @@ class PickAndPlaceManager(Node):
         place_orient = place_data["orientation"]
 
         approach_place = place_pos.copy()
-        approach_place[2] += 0.097
+        approach_place[2] += 0.15
         
         # 2) go to above the place position
         if not self.move_ee_to_pose(approach_place, place_orient):
@@ -190,6 +247,9 @@ class PickAndPlaceManager(Node):
         if not self.move_ee_to_pose(place_pos, place_orient):
             return False
         time.sleep(2)
+        
+        self.detach_object(object_id=cup_name)
+        self.remove_object(object_id=cup_name)
 
         # 4) Open the gripper
         self.mid_gripper()
@@ -200,18 +260,10 @@ class PickAndPlaceManager(Node):
             return False
         time.sleep(2)
 
-        # # 5) Move up to the "HOME" pose
-        # if not self.move_ee_to_pose(EXTRA_LOCATIONS["HOME"]["position"],
-        #                             EXTRA_LOCATIONS["HOME"]["orientation"]):
-        #     return False
-        # time.sleep(2)
-
         self.get_logger().info(f"Successfully placed '{cup_name}' at '{place_key}'")
         return True
-
-    # --------------------------------------------------------------------------
-    # Helpers for gripper control & MoveIt
-    # --------------------------------------------------------------------------
+    
+    # gripper contorl functions
     def open_gripper(self):
         self._send_gripper_cmd(GRIPPER_OPEN)
 
@@ -231,7 +283,7 @@ class PickAndPlaceManager(Node):
             return
 
         start_time = time.time()
-        timeout = 60
+        timeout = 15
         result_future = goal_handle.get_result_async()
 
         while rclpy.ok() and not result_future.done():
@@ -270,6 +322,7 @@ class PickAndPlaceManager(Node):
         result = result_future.result().result
         self.get_logger().info(f"Gripper result: reached={result.reached_goal}, stalled={result.stalled}")
 
+    # main function to move arm 
     def move_ee_to_pose(self, position, orientation, sphere_radius=0.01, max_attempts=25):
         goal_msg = MoveGroup.Goal()
 
@@ -295,8 +348,8 @@ class PickAndPlaceManager(Node):
         sphere_pose.position.x = position[0]
         sphere_pose.position.y = position[1]
         sphere_pose.position.z = position[2]
-        sphere_pose.orientation.w = 1.0  # orientation is enforced separately
-
+        sphere_pose.orientation.w = 1.0
+        
         pc.constraint_region.primitives.append(sphere)
         pc.constraint_region.primitive_poses.append(sphere_pose)
         constraints.position_constraints.append(pc)
@@ -308,11 +361,11 @@ class PickAndPlaceManager(Node):
 
         z_box = SolidPrimitive()
         z_box.type = SolidPrimitive.BOX
-        z_box.dimensions = [10.0, 10.0, 1.75]
+        z_box.dimensions = [10.0, 10.0, 1.7]
         z_box_pose = Pose()
         z_box_pose.position.x = 0.0
         z_box_pose.position.y = 0.0
-        z_box_pose.position.z = 2.25
+        z_box_pose.position.z = 2.1
         z_box_pose.orientation.w = 1.0
 
         arm_constraint.constraint_region.primitives.append(z_box)
@@ -370,36 +423,23 @@ class PickAndPlaceManager(Node):
         self.get_logger().error("All attempts to plan this motion failed.")
         return False
 
-
-###############################################################################
-#                      LLM Node – Recognizing 3 Types of Commands
-###############################################################################
-class LLMAndNavNode(Node):
-    """
-    Polls user input, sends to an LLM, and based on the LLM’s response:
-     - If it indicates “pick,” do a pick with extracted color (or default).
-     - If it indicates “place,” do a place with extracted location (or default).
-     - If it indicates “pick and place,” do both in sequence.
-     - If the user only says “place,” we use the currently_held_item from a prior pick.
-    """
-class LLMAndNavNode(Node):
+# LLM class
+class LLMNode(Node):
     def __init__(self):
         super().__init__('llm_node')
 
         # For calling OpenAI
-        openai.api_key = os.getenv("OPENAI_API_KEY")
+        # openai.api_key = os.getenv("OPENAI_API_KEY")
         # self.get_logger().info("LLM node started")
-
+        
         self.currently_held_item = None
         self.pick_place_mgr = PickAndPlaceManager()
 
-        # NEW: Chat memory and clarification flag
         self.chat_history = []
         self.awaiting_clarification = False
 
         self.busy = False
         self.poll_timer = self.create_timer(5.0, self.poll_user)
-        # self.get_logger().info("Ready for user commands...")
         
         self.slot_coordinates = {
             slot: (data["position"][0], data["position"][1])  # X, Y only
@@ -410,21 +450,41 @@ class LLMAndNavNode(Node):
             f"{slot}: X={coord[0]:.3f}, Y={coord[1]:.3f}"
             for slot, coord in self.slot_coordinates.items()
         ])
+        
+        welcome_text = self.get_welcome_message_from_gpt()
+        self.get_logger().info(f"\n{welcome_text}")
 
+    def get_welcome_message_from_gpt(self):
+        self.chat_history.append({"role": "user", "content": ""})  # or "Start conversation" if you prefer
+        response = self.query_llm()
+        self.chat_history.append({"role": "assistant", "content": response})
+        return response
+    
     def poll_user(self):
         if self.busy:
             return
         self.busy = True
         try:
-            user_text = input("\nCommand: ").strip()
+            user_text = input("\nCommand: ").strip()           
             if not user_text:
+                return
+            
+            # Hard-coded exit fallback
+            if user_text.lower() in ["quit", "exit"]:
+                self.get_logger().info("Console says 'quit'. Exiting now.")
+                self.stop_and_exit()
                 return
 
             self.chat_history.append({"role": "user", "content": user_text})
             response = self.query_llm()
             self.chat_history.append({"role": "assistant", "content": response})
-            self.get_logger().info(f"LLM response: {response}")
+            self.get_logger().info(f"LLM response: {response}\n")
 
+            if "exit" in response.lower():
+                self.get_logger().info("GPT requested exit. Stopping everything.")
+                self.stop_and_exit()
+                return
+            
             # If LLM is asking a clarification question, wait for next input
             if response.strip().endswith("?"):
                 self.awaiting_clarification = True
@@ -437,6 +497,10 @@ class LLMAndNavNode(Node):
 
             color = self.extract_color(response)
             location = self.extract_location(response)
+
+            if do_pick and not do_place and not color:
+                self.get_logger().info("I'm not sure which color you meant. Could you clarify?")
+                return
 
             if "step" in response.lower():
                 self.handle_multi_step(response)
@@ -456,7 +520,13 @@ class LLMAndNavNode(Node):
             self.get_logger().error(f"Error in command: {e}")
         finally:
             self.busy = False
-        
+    
+    def stop_and_exit(self):
+        self.poll_timer.cancel()
+        self.destroy_node()
+        self.pick_place_mgr.destroy_node()
+        sys.exit(0)
+    
     def handle_multi_step(self, response: str):
         step_pattern = r"Step\s*\d+:\s*(.*)"
         step_lines = re.findall(step_pattern, response, re.IGNORECASE)
@@ -469,9 +539,6 @@ class LLMAndNavNode(Node):
             lower = line.lower()
             cup = self.extract_color(line)
             slot = self.extract_location(line)
-
-            # self.get_logger().info(f"Step {i}: parsed line -> '{line.strip()}'")
-            self.get_logger().info(f"Step {i}: LLM interpreted -> Pick {cup}, Place in {slot}")
 
             # Pick + Place
             if "pick" in lower and "place" in lower and cup and slot:
@@ -515,9 +582,7 @@ class LLMAndNavNode(Node):
                 self.get_logger().warn(f"Step {i}: Could not interpret action for line: {line}")
 
             
-    # --------------------------------------------------------------------------
-    # Concrete methods to do pick or place
-    # --------------------------------------------------------------------------
+    # methods to do pick or place
     def do_pick_only(self, cup_name):
         if not cup_name:
             self.get_logger().error("LLM says to pick, but no item was determined!")
@@ -536,66 +601,92 @@ class LLMAndNavNode(Node):
             self.currently_held_item = None
 
     def do_pick_and_place(self, cup_name, place_key):
-        # First pick
         ok_pick = self.pick_place_mgr.pick(cup_name)
         if not ok_pick:
             return
         self.currently_held_item = cup_name
 
-        # Then place
         ok_place = self.pick_place_mgr.place(cup_name, place_key)
         if ok_place:
             self.currently_held_item = None
-
-    # --------------------------------------------------------------------------
-    # LLM handling
-    # --------------------------------------------------------------------------   
+   
     def query_llm(self):
         try:
             slot_info = self.slot_info
-            
-            # works for multistep
             system_prompt = (
-                # initalising
                 "You control a robot that can pick up and place colored cups.\n"
-                "robot can do three seperate tasks: pick only, place only, pick and place\n"
+                "When the conversation starts, greet the user with a welcome and give a quick introduction."
+                "If the user says anything about stopping or quitting, respond with 'exit'. "
+                "The robot can do three separate tasks:\n"
+                "  1) pick only\n"
+                "  2) place only\n"
+                "  3) pick and place\n\n"
                 "Available cups: RedCup, GreenCup, BlueCup, YellowCup, PurpleCup.\n"
-                "Available places: A, B, C, AA, BB, CC.\n"
-                "This is the XY coordinates of the places:\n"
-                f"{slot_info}\n\n"
-                # MutliStep Instuctions
-                "Users may provide one or more instructions in a single sentence, like: "
-                "'Pick up the red cup and place it in AA, then pick up the green cup and put it in BB.' "
-                "Respond with a step-by-step list using this exact format:\n\n"
-                "Step 1: pick RedCup and place in AA\n"
-                "Step 2: pick GreenCup and place in BB\n\n"
-                "If the robot is already holding a cup, and the user says place it, you must NOT add a pick step."
-                # Spatial Locations
-                "You can reason about relative spatial relationships using coordinates:\n"
-                "- Below = if Y coordinate of place is greater Y coordinate of user given place, then it is below\n"
-                "- Above = if Y coordinate of place is smaller Y coordinate of user given place, then it is above\n"
-                "- Left = if X coordinate of place is greater X coordinate of user given place, then it is left\n"
-                "- Right = if X coordinate of place is smaller X coordinate of user given place, then it is right\n"
-                "Examples:\n"
-                "- If A is at (1.42, -0.04) and AA is at (1.42, 0.21), then AA is BELOW A\n"
-                "- If BB is at (1.13, 0.21) and CC is at (0.83, 0.21), then CC is to the RIGHT of BB\n"
-                "- If BB is at (1.13, 0.21) and B is at (1.13, -0.04), then B is ABOVE BB\n"
-                "- If CC is at (0.83, 0.21) and BB is at (1.13, 0.21), then BB is to the LEFT of CC\n"
-                "IMPORTANT: If the user gives a spatial reference like 'to the right of BB', "
-                "you MUST replace that with the exact slot name based on coordinate logic.\n"
-                "NEVER say 'to the right of BB' in your final output. Always resolve it.\n\n"
-                
-                "If something is unclear, ask for clarification. Respond only with steps or a clarification question."
-            )
+                "Available places: A, B, C, AA, BB, CC.\n\n"
 
-            resp = openai.chat.completions.create(
-                model="gpt-3.5-turbo",
+                "Users may provide one or more instructions in a single sentence, such as:\n"
+                "  'Pick up the red cup and place it in AA, then pick up the green cup and put it in BB.'\n"
+                "Respond with a step-by-step list, using this exact format:\n"
+                "  Step 1: pick RedCup and place in AA\n"
+                "  Step 2: pick GreenCup and place in BB\n\n"
+
+                "If the robot is already holding a cup, and the user says to place it, do not add a pick step.\n"
+                "If the user only says 'pick up the red cup,' do not add a place step.\n"
+
+                "When the user references a location with a spatial term (e.g. 'to the right of BB'), you can "
+                "determine which place key is actually 'to the right' by using the XY coordinate table below.\n"
+                "Do not say 'to the right of BB' in your final output. Instead, replace it with the exact place name.\n\n"
+
+                "Here are the XY coordinates of each place:\n"
+                f"{slot_info}\n\n"
+
+                "Spatial definitions:\n"
+                "- 'Below' => if Y coordinate of place is GREATER than the Y of the reference.\n"
+                "- 'Above' => if Y coordinate of place is SMALLER than the Y of the reference.\n"
+                "- 'Left' => if X coordinate is GREATER than the reference's X.\n"
+                "- 'Right' => if X coordinate is SMALLER than the reference's X.\n"
+                "Examples:\n"
+                "- If A is (1.42, -0.04) and AA is (1.42, 0.21), then AA is BELOW A.\n"
+                "- If BB is (1.13, 0.21) and CC is (0.83, 0.21), then CC is to the RIGHT of BB.\n"
+                "- If BB is (1.13, 0.21) and B is (1.13, -0.04), B is ABOVE BB.\n"
+                "- If CC is (0.83, 0.21) and BB is (1.13, 0.21), BB is to the LEFT of CC.\n\n"
+
+                "Minor Spelling Mistakes:\n"
+                " - If the user spells a color or place name slightly incorrectly but it clearly matches one of the known options, "
+                "   please correct it automatically. For example, if user says 'grean cup', interpret that as 'GreenCup'.\n"
+                " - If the user's spelling is truly ambiguous or conflicts with more than one known option, ask for clarification.\n\n"
+                
+                "Formatting Requirements:\n"
+                "- ALWAYS respond with step-by-step lines in the format:\n"
+                "    Step 1: pick RedCup\n"
+                "    Step 2: place in BB\n"
+                "or\n"
+                "    Step 1: pick RedCup and place in BB\n"
+                "- If you have multiple steps, number them in increasing order.\n"
+                "- If something is unclear, respond with a single clarifying question.\n"
+                
+                "You can also respond to general small talk. If the user’s message does not contain any pick/place instructions, "
+                "respond politely with a short, casual reply. "
+            )
+            
+            client = OpenAI(api_key="sk-", base_url="https://api.deepseek.com")
+            resp = client.chat.completions.create(
+                model="deepseek-chat",
                 messages=[
                     {"role": "system", "content": system_prompt},
                     *self.chat_history
                 ],
                 temperature=0.0
             )
+            # resp = openai.chat.completions.create(
+            #     # model="gpt-3.5-turbo",
+            #     model="gpt-4-turbo",
+            #     messages=[
+            #         {"role": "system", "content": system_prompt},
+            #         *self.chat_history
+            #     ],
+            #     temperature=0.0
+            # )
             return resp.choices[0].message.content
 
         except Exception as e:
@@ -604,7 +695,6 @@ class LLMAndNavNode(Node):
 
 
     def extract_color(self, text):
-        """Look for known color words in the LLM response."""
         lower = text.lower()
         for c in ["red", "green", "blue", "yellow", "purple"]:
             if c in lower: 
@@ -621,19 +711,15 @@ class LLMAndNavNode(Node):
                 return place
         return None
 
-###############################################################################
-#                               MAIN
-###############################################################################
 def main(args=None):
     rclpy.init(args=args)
-    node = LLMAndNavNode()
+    node = LLMNode()
 
     try:
         rclpy.spin(node)
     except KeyboardInterrupt:
         pass
     finally:
-        # Destroy the main node, also pick_place_mgr is a child node inside it
         node.pick_place_mgr.destroy_node()
         node.destroy_node()
         rclpy.shutdown()
